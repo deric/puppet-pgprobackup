@@ -24,6 +24,12 @@ describe 'pgprobackup::repo' do
         it {
           is_expected.to contain_class('pgprobackup::repo::yum')
         }
+        it {
+          flavor = os_facts[:os]['name'].downcase
+          is_expected.to contain_yumrepo('pgprobackup').with(
+            baseurl: "https://repo.postgrespro.ru/pg_probackup/keys/pg_probackup-repo-#{flavor}.noarch.rpm"
+          )
+        }
       end
     end
   end
