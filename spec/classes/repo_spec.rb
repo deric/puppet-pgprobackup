@@ -17,7 +17,7 @@ describe 'pgprobackup::repo' do
         it {
           is_expected.to contain_apt__source('pgprobackup').with(
             location: 'https://repo.postgrespro.ru/pg_probackup/deb/',
-            release: os_facts[:os]['distro']['codename']
+            release: os_facts[:os]['distro']['codename'],
           )
         }
       when 'RedHat'
@@ -27,7 +27,7 @@ describe 'pgprobackup::repo' do
         it {
           flavor = os_facts[:os]['name'].downcase
           is_expected.to contain_yumrepo('pgprobackup').with(
-            baseurl: "https://repo.postgrespro.ru/pg_probackup/keys/pg_probackup-repo-#{flavor}.noarch.rpm"
+            baseurl: "https://repo.postgrespro.ru/pg_probackup/keys/pg_probackup-repo-#{flavor}.noarch.rpm",
           )
         }
       end
