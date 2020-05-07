@@ -11,22 +11,10 @@ class pgprobackup::install {
     default => $package_ensure,
   }
 
-  $_packages = [$_package_name]
-
   if $pgprobackup::debug_symbols {
-    case $facts['os']['family'] {
-      'RedHat', 'Linux': {
-        concat($_packages, "${_package_name}-debuginfo")
-      }
-
-      'Debian': {
-        concat($_packages, "${_package_name}-dbg")
-      }
-
-      default: {
-        fail("Unsupported managed repository for osfamily: ${::osfamily}, operatingsystem: ${::operatingsystem}, module ${module_name} currently only supports managing repos for osfamily RedHat and Debian")
-      }
-    }
+    $_packages = [$_package_name, "${_package_name}-${pgprobackup::debug_suffix}"]
+  } else {
+    $_packages = [$_package_name]
   }
 
   ensure_packages($_packages, {

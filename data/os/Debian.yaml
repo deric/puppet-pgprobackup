@@ -1,0 +1,3 @@
+---
+pgprobackup::package_name: pg-probackup
+pgprobackup::debug_suffix: dbg
