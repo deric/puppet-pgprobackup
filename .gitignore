@@ -1,4 +1,7 @@
 .git/
+/.librarian/
+/.tmp/
+Puppetfile.lock
 .*.sw[op]
 .metadata
 .yardoc
