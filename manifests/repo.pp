@@ -5,7 +5,7 @@ class pgprobackup::repo(
   Boolean          $src     = false,
 ) {
 
-  case $::osfamily {
+  case $facts['os']['family'] {
     'RedHat', 'Linux': {
       class { 'pgprobackup::repo::yum': }
     }
