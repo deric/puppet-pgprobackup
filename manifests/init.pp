@@ -17,6 +17,7 @@ class pgprobackup(
   String $package_ensure  = 'present',
   String $package_name,
   String $version         = '12',
+  String $host_group      = 'common',
   Boolean $debug_symbols  = true,
   Optional[String] $debug_suffix,
 ) {

@@ -12,6 +12,8 @@
 #   Permission mode for backup storage
 # @param manage_ssh_keys
 #   Whether ssh directory should be managed
+# @param host_group
+#   Allows to import only certain servers
 #
 # @example
 #   include pgprobackup::catalog
@@ -23,8 +25,8 @@ class pgprobackup::catalog (
   Enum['present', 'absent'] $user_ensure = 'present',
   Boolean                   $manage_ssh_keys = true,
   Optional[Integer]         $uid = undef,
-) {
-  include ::pgprobackup
+  String                    $host_group = $pgprobackup::host_group,
+) inherits ::pgprobackup {
 
   user { $user:
     ensure => $user_ensure,
@@ -75,7 +77,18 @@ class pgprobackup::catalog (
     }
   }
 
+  # create an empty .pgpass file
+  file { "${backup_dir}/.pgpass":
+    ensure  => 'file',
+    owner   => $user,
+    group   => $group,
+    mode    => '0600',
+    require => File[$backup_dir],
+  }
 
+  # import resources exported by pgprobackup::instance(s)
 
+  # Fill the .pgpass file
+  File_line <<| tag == "pgprobackup-${host_group}" |>>
 
 }

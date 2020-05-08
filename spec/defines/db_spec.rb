@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'pgprobackup::instance' do
+describe 'pgprobackup::db' do
   let(:title) { 'namevar' }
   let(:params) do
     {}
