@@ -20,13 +20,14 @@ class pgprobackup::instance(
   String  $server_address                = $::fqdn,
   Integer $server_port                   = 5432,
   Boolean $manage_dbuser                 = true,
-  String  $db_name                       = 'backup',
-  String  $db_user                       = 'backup',
+  String  $db_name                       = $pgprobackup::db_name,
+  String  $db_user                       = $pgprobackup::db_user,
   String  $db_password                   = '',
   Optional[String] $seed                 = undef,
   Boolean $manage_ssh_keys               = $pgprobackup::manage_ssh_keys,
   Boolean $manage_host_keys              = $pgprobackup::manage_host_keys,
   Boolean $manage_pgpass                 = $pgprobackup::manage_pgpass,
+  Boolean $manage_hba                    = $pgprobackup::manage_hba,
   Stdlib::AbsolutePath      $backup_dir  = $pgprobackup::backup_dir,
   ) inherits ::pgprobackup {
 

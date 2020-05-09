@@ -5,7 +5,7 @@
 # @param $backup_dir
 #   Directory for storing backups, also home directory for backup user
 # @param $user
-#   User account used for running backups
+#   Local user account used for running and storing backups in its home dir.
 # @param $group
 #   Primary group of backup user
 # @param dir_mode
@@ -19,6 +19,7 @@
 #   include pgprobackup::catalog
 class pgprobackup::catalog (
   Stdlib::AbsolutePath      $backup_dir = $pgprobackup::backup_dir,
+  String                    $exported_ipaddress = "${::ipaddress}/32",
   String                    $user = 'pgbackup',
   String                    $group = 'pgbackup',
   String                    $dir_mode = '0750',
@@ -26,8 +27,10 @@ class pgprobackup::catalog (
   Boolean                   $manage_ssh_keys = $pgprobackup::manage_ssh_keys,
   Boolean                   $manage_host_keys = $pgprobackup::manage_host_keys,
   Boolean                   $manage_pgpass = $pgprobackup::manage_pgpass,
+  Boolean                   $manage_hba = $pgprobackup::manage_hba,
   Optional[Integer]         $uid = undef,
   String                    $host_group = $pgprobackup::host_group,
+  Integer                   $hba_entry_order = 50,
 ) inherits ::pgprobackup {
 
   user { $user:
@@ -108,6 +111,19 @@ class pgprobackup::catalog (
       type         => $pgprobackup::host_key_type,
       target       => '/var/lib/postgresql/.ssh/known_hosts',
       tag          => "pgprobackup-${host_group}",
+    }
+  }
+
+  if $manage_hba {
+    @@postgresql::server::pg_hba_rule { "pgprobackup ${::hostname} access":
+      description => "pgprobackup ${::hostname} access",
+      type        => 'host',
+      database    => $pgprobackup::db_name,
+      user        => $pgprobackup::db_user,
+      address     => $exported_ipaddress,
+      auth_method => 'md5',
+      order       => $hba_entry_order,
+      tag         => "pgprobackup-${host_group}",
     }
   }
 
