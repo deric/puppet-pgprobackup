@@ -18,12 +18,14 @@
 # @example
 #   include pgprobackup::catalog
 class pgprobackup::catalog (
-  Stdlib::AbsolutePath      $backup_dir = '/var/lib/pgbackup',
+  Stdlib::AbsolutePath      $backup_dir = $pgprobackup::backup_dir,
   String                    $user = 'pgbackup',
   String                    $group = 'pgbackup',
   String                    $dir_mode = '0750',
   Enum['present', 'absent'] $user_ensure = 'present',
-  Boolean                   $manage_ssh_keys = true,
+  Boolean                   $manage_ssh_keys = $pgprobackup::manage_ssh_keys,
+  Boolean                   $manage_host_keys = $pgprobackup::manage_host_keys,
+  Boolean                   $manage_pgpass = $pgprobackup::manage_pgpass,
   Optional[Integer]         $uid = undef,
   String                    $host_group = $pgprobackup::host_group,
 ) inherits ::pgprobackup {
@@ -75,20 +77,38 @@ class pgprobackup::catalog (
       mode    => '0600',
       require => File["${backup_dir}/.ssh"],
     }
+
+    # Add public ssh keys from DB instances as authorized keys
+    Ssh_authorized_key <<| tag == "pgprobackup-${host_group}-instance" |>>
   }
 
-  # create an empty .pgpass file
-  file { "${backup_dir}/.pgpass":
-    ensure  => 'file',
-    owner   => $user,
-    group   => $group,
-    mode    => '0600',
-    require => File[$backup_dir],
+  if $manage_pgpass {
+    # create an empty .pgpass file
+    file { "${backup_dir}/.pgpass":
+      ensure  => 'file',
+      owner   => $user,
+      group   => $group,
+      mode    => '0600',
+      require => File[$backup_dir],
+    }
+
+    # Fill the .pgpass file
+    File_line <<| tag == "pgprobackup-${host_group}" |>>
   }
 
-  # import resources exported by pgprobackup::instance(s)
+  if $manage_host_keys {
+    # Import db instances host keys
+    Sshkey <<| tag == "pgprobackup-${host_group}-instance" |>>
 
-  # Fill the .pgpass file
-  File_line <<| tag == "pgprobackup-${host_group}" |>>
+    # Export catalog's host key
+    @@sshkey { "pgprobackup-catalog-${::fqdn}":
+      ensure       => present,
+      host_aliases => [$::hostname, $::fqdn, $::ipaddress],
+      key          => $::sshecdsakey,
+      type         => $pgprobackup::host_key_type,
+      target       => '/var/lib/postgresql/.ssh/known_hosts',
+      tag          => "pgprobackup-${host_group}",
+    }
+  }
 
 }
