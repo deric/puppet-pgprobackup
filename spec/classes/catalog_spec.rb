@@ -9,6 +9,7 @@ describe 'pgprobackup::catalog' do
 
     it { is_expected.to compile }
     it { is_expected.to contain_class('pgprobackup::install') }
+    it { is_expected.to contain_class('pgprobackup::repo') }
 
     it { is_expected.to contain_user('pgbackup') }
 

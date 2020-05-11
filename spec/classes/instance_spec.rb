@@ -11,6 +11,8 @@ describe 'pgprobackup::instance' do
     let(:facts) { os_facts }
 
     it { is_expected.to compile }
+    it { is_expected.to contain_class('pgprobackup::install') }
+    it { is_expected.to contain_class('pgprobackup::repo') }
 
     case os_facts[:os]['family']
       when 'Debian'

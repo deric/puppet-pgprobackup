@@ -46,5 +46,9 @@ class pgprobackup(
   String               $host_key_type    = 'ecdsa-sha2-nistp521',
 ) {
 
+  contain pgprobackup::repo
   contain pgprobackup::install
+
+  Class['pgprobackup::repo']
+  -> Class['pgprobackup::install']
 }
