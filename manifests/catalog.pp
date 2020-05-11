@@ -33,11 +33,16 @@ class pgprobackup::catalog (
   Integer                   $hba_entry_order = 50,
 ) inherits ::pgprobackup {
 
-  user { $user:
+  group { $group:
     ensure => $user_ensure,
-    uid    => $uid,
-    gid    => $group, # a primary group
-    home   => $backup_dir,
+  }
+
+  user { $user:
+    ensure  => $user_ensure,
+    uid     => $uid,
+    gid     => $group, # a primary group
+    home    => $backup_dir,
+    require => Group[$group],
   }
 
   file { $backup_dir:
