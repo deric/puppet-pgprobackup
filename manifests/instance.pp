@@ -84,7 +84,7 @@ class pgprobackup::instance(
       host_aliases => [$::hostname, $::fqdn, $::ipaddress, $server_address],
       key          => $::sshecdsakey,
       type         => $pgprobackup::host_key_type,
-      target       => "${backup_dir}/.ssh/known_hosts",
+      #target       => "${backup_dir}/.ssh/known_hosts",
       tag          => "pgprobackup-${host_group}-instance",
     }
   }
