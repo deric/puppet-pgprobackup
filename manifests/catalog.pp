@@ -24,6 +24,7 @@ class pgprobackup::catalog (
   String                    $group = 'pgbackup',
   String                    $dir_mode = '0750',
   Enum['present', 'absent'] $user_ensure = 'present',
+  String                    $user_shell = '/bin/bash',
   Boolean                   $manage_ssh_keys = $pgprobackup::manage_ssh_keys,
   Boolean                   $manage_host_keys = $pgprobackup::manage_host_keys,
   Boolean                   $manage_pgpass = $pgprobackup::manage_pgpass,
@@ -42,6 +43,7 @@ class pgprobackup::catalog (
     uid     => $uid,
     gid     => $group, # a primary group
     home    => $backup_dir,
+    shell   => $user_shell,
     require => Group[$group],
   }
 
