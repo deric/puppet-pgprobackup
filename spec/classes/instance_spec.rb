@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'pgprobackup::instance' do
-  os, os_facts = on_supported_os.first
+  _, os_facts = on_supported_os.first
 
   let(:pre_condition) { 'include postgresql::server' }
 

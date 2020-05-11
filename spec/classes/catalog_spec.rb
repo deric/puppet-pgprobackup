@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'pgprobackup::catalog' do
-  os, os_facts = on_supported_os.first
+  _, os_facts = on_supported_os.first
   context 'when running with default parameters' do
     let(:facts) { os_facts }
 
