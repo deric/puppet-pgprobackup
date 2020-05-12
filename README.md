@@ -47,5 +47,13 @@ pgprobackup::instance::backups:
     minute: 15
     weekday: 0 # same as `7` or `Sunday`
 ```
+Incremental (`DELTA`) backups every day except Sunday:
+```yaml
+pgprobackup::instance::backups:
+  FULL:
+    weekday: 0
+  DELTA:
+    weekday: 1-6
+```
 
 There are many shared parameters between `instance` and `catalog`. Such parameters are defined in `pgprobackup::` namespace, such as `pgprobackup::version` (major release version, respect PostgreSQL releases: `11`, `12` etc.).

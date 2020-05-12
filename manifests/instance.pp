@@ -118,11 +118,30 @@ class pgprobackup::instance(
         >> ${log_file} 2>&1
         | -CMD
         user     => $backup_user,
-        weekday  => pick($full['weekday'], undef),
+        weekday  => pick($full['weekday'], '*'),
         hour     => pick($full['hour'], '4'),
         minute   => pick($full['minute'], '00'),
-        month    => pick($full['month'], undef),
-        monthday => pick($full['monthday'], undef),
+        month    => pick($full['month'], '*'),
+        monthday => pick($full['monthday'], '*'),
+        tag      => "pgprobackup-${host_group}",
+      }
+    }
+
+    if has_key($backups, 'DELTA') {
+      $delta = $backups['DELTA']
+      @@cron { "pgprobackup_full_${::fqdn}":
+        command  => @(CMD/L),
+        [ -x /usr/bin/pg_probackup-${pgprobackup::version} ] &&
+        /usr/bin/pg_probackup-${pgprobackup::version} --instance ${id} -b DELTA
+        --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name}
+        >> ${log_file} 2>&1
+        | -CMD
+        user     => $backup_user,
+        weekday  => pick($delta['weekday'], '*'),
+        hour     => pick($delta['hour'], '4'),
+        minute   => pick($delta['minute'], '00'),
+        month    => pick($delta['month'], '*'),
+        monthday => pick($delta['monthday'], '*'),
         tag      => "pgprobackup-${host_group}",
       }
     }

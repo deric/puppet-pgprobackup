@@ -87,5 +87,26 @@ describe 'pgprobackup::instance' do
           )
       }
     end
+
+    context 'with enabled DELTA backup' do
+      let(:params) do
+        {
+          backups: {
+            DELTA: {},
+          },
+        }
+      end
+
+      it {
+        expect(exported_resources).to contain_cron('pgprobackup_full_psql.localhost')
+          .with(
+            user: 'pgbackup',
+            monthday: '*',
+            weekday: '*',
+            hour: '4',
+            minute: '00',
+          )
+      }
+    end
   end
 end
