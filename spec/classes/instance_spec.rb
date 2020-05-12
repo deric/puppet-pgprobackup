@@ -98,7 +98,7 @@ describe 'pgprobackup::instance' do
       end
 
       it {
-        expect(exported_resources).to contain_cron('pgprobackup_full_psql.localhost')
+        expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost')
           .with(
             user: 'pgbackup',
             monthday: '*',

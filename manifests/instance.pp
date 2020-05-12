@@ -110,7 +110,7 @@ class pgprobackup::instance(
   if $manage_cron {
     if has_key($backups, 'FULL') {
       $full = $backups['FULL']
-      @@cron { "pgprobackup_full_${::fqdn}":
+      @@cron { "pgprobackup_full_${server_address}":
         command  => @(CMD/L),
         [ -x /usr/bin/pg_probackup-${pgprobackup::version} ] &&
         /usr/bin/pg_probackup-${pgprobackup::version} --instance ${id} -b FULL
@@ -129,7 +129,7 @@ class pgprobackup::instance(
 
     if has_key($backups, 'DELTA') {
       $delta = $backups['DELTA']
-      @@cron { "pgprobackup_full_${::fqdn}":
+      @@cron { "pgprobackup_delta_${server_address}":
         command  => @(CMD/L),
         [ -x /usr/bin/pg_probackup-${pgprobackup::version} ] &&
         /usr/bin/pg_probackup-${pgprobackup::version} --instance ${id} -b DELTA
