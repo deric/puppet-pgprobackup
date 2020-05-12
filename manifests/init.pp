@@ -39,6 +39,7 @@ class pgprobackup(
   Boolean              $debug_symbols    = true,
   Optional[String]     $debug_suffix,
   Stdlib::AbsolutePath $backup_dir       = '/var/lib/pgbackup',
+  String               $backup_user      = 'pgbackup',
   Boolean              $manage_ssh_keys  = true,
   Boolean              $manage_host_keys = true,
   Boolean              $manage_pgpass    = true,

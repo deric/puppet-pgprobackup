@@ -20,8 +20,8 @@
 class pgprobackup::catalog (
   Stdlib::AbsolutePath      $backup_dir = $pgprobackup::backup_dir,
   String                    $exported_ipaddress = "${::ipaddress}/32",
-  String                    $user = 'pgbackup',
-  String                    $group = 'pgbackup',
+  String                    $user = $pgprobackup::backup_user,
+  String                    $group = $pgprobackup::backup_user,
   String                    $dir_mode = '0750',
   Enum['present', 'absent'] $user_ensure = 'present',
   String                    $user_shell = '/bin/bash',
@@ -32,6 +32,7 @@ class pgprobackup::catalog (
   Optional[Integer]         $uid = undef,
   String                    $host_group = $pgprobackup::host_group,
   Integer                   $hba_entry_order = 50,
+  String                    $ssh_key_fact = $::pgprobackup_catalog_key,
 ) inherits ::pgprobackup {
 
   group { $group:
@@ -131,6 +132,20 @@ class pgprobackup::catalog (
       auth_method => 'md5',
       order       => $hba_entry_order,
       tag         => "pgprobackup-${host_group}",
+    }
+  }
+
+  # Export (and add as authorized key) ssh key from pgbackup user
+  # to all DB instances in host_group. Key is generated/fetch via
+  # custom Facter function `pgprobackup_keygen`
+  if ($ssh_key_fact != undef and $ssh_key_fact != '') {
+    $ssh_key_splitted = split($ssh_key_fact, ' ')
+    @@ssh_authorized_key { "pgprobackup-${::fqdn}":
+      ensure => present,
+      user   => 'postgres',
+      type   => $ssh_key_splitted[0],
+      key    => $ssh_key_splitted[1],
+      tag    => "pgprobackup-${host_group}",
     }
   }
 

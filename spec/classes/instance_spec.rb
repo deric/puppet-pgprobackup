@@ -8,11 +8,25 @@ describe 'pgprobackup::instance' do
   let(:pre_condition) { 'include postgresql::server' }
 
   context 'with default parameters' do
-    let(:facts) { os_facts }
+    let(:facts) do
+      os_facts.merge(
+        pgprobackup_instance_key: 'ssh-rsa AAABBBCCC',
+        fqdn: 'psql.localhost',
+      )
+    end
 
     it { is_expected.to compile }
     it { is_expected.to contain_class('pgprobackup::install') }
     it { is_expected.to contain_class('pgprobackup::repo') }
+
+    it {
+      expect(exported_resources).to contain_ssh_authorized_key('postgres-psql.localhost')
+        .with(
+          user: 'pgbackup',
+          type: 'ssh-rsa',
+          key: 'AAABBBCCC',
+        )
+    }
 
     case os_facts[:os]['family']
     when 'Debian'

@@ -28,7 +28,9 @@ class pgprobackup::instance(
   Boolean $manage_host_keys              = $pgprobackup::manage_host_keys,
   Boolean $manage_pgpass                 = $pgprobackup::manage_pgpass,
   Boolean $manage_hba                    = $pgprobackup::manage_hba,
-  Stdlib::AbsolutePath      $backup_dir  = $pgprobackup::backup_dir,
+  Stdlib::AbsolutePath $backup_dir       = $pgprobackup::backup_dir,
+  String               $backup_user      = $pgprobackup::backup_user,
+  String               $ssh_key_fact     = $::pgprobackup_instance_key,
   ) inherits ::pgprobackup {
 
   if !defined(Class['postgresql::server']) {
@@ -59,8 +61,21 @@ class pgprobackup::instance(
   Postgresql::Server::Pg_hba_rule <<| tag == "pgprobackup-${host_group}" |>>
 
   if $manage_ssh_keys {
+    # Add public key from backup server as authorized
     Ssh_authorized_key <<| tag == "pgprobackup-${host_group}" |>> {
       require => Class['postgresql::server'],
+    }
+
+    # Export own public SSH key
+    if ($ssh_key_fact != undef and $ssh_key_fact != '') {
+      $ssh_key_split = split($ssh_key_fact, ' ')
+      @@ssh_authorized_key { "postgres-${::fqdn}":
+        ensure => present,
+        user   => $backup_user,
+        type   => $ssh_key_split[0],
+        key    => $ssh_key_split[1],
+        tag    => "pgprobackup-${host_group}-instance",
+      }
     }
   }
 
@@ -88,6 +103,4 @@ class pgprobackup::instance(
       tag          => "pgprobackup-${host_group}-instance",
     }
   }
-
-
 }
