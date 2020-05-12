@@ -12,32 +12,43 @@
 #   DB port
 # @param manage_dbuser
 #   Whether role for running backups should be managed.
+# @param version
+#   Major PostgreSQL release version
 # @example
 #   include pgprobackup::instance
 class pgprobackup::instance(
-  String  $id                            = $::hostname,
-  String  $host_group                    = $pgprobackup::host_group,
-  String  $server_address                = $::fqdn,
-  Integer $server_port                   = 5432,
-  Boolean $manage_dbuser                 = true,
-  String  $db_name                       = $pgprobackup::db_name,
-  String  $db_user                       = $pgprobackup::db_user,
-  String  $db_password                   = '',
-  Optional[String] $seed                 = undef,
-  Boolean $manage_ssh_keys               = $pgprobackup::manage_ssh_keys,
-  Boolean $manage_host_keys              = $pgprobackup::manage_host_keys,
-  Boolean $manage_pgpass                 = $pgprobackup::manage_pgpass,
-  Boolean $manage_hba                    = $pgprobackup::manage_hba,
-  Boolean $manage_cron                   = $pgprobackup::manage_cron,
-  Stdlib::AbsolutePath $backup_dir       = $pgprobackup::backup_dir,
-  String               $backup_user      = $pgprobackup::backup_user,
-  String               $ssh_key_fact     = $::pgprobackup_instance_key,
-  Stdlib::AbsolutePath $log_file         = '/var/log/pgprobackup.log',
-  Hash                 $backups          = {},
+  String  $id                               = $::hostname,
+  String  $host_group                       = $pgprobackup::host_group,
+  String  $server_address                   = $::fqdn,
+  Integer $server_port                      = 5432,
+  Boolean $manage_dbuser                    = true,
+  String  $db_name                          = $pgprobackup::db_name,
+  String  $db_user                          = $pgprobackup::db_user,
+  String  $db_password                      = '',
+  Optional[String] $seed                    = undef,
+  Boolean $manage_ssh_keys                  = $pgprobackup::manage_ssh_keys,
+  Boolean $manage_host_keys                 = $pgprobackup::manage_host_keys,
+  Boolean $manage_pgpass                    = $pgprobackup::manage_pgpass,
+  Boolean $manage_hba                       = $pgprobackup::manage_hba,
+  Boolean $manage_cron                      = $pgprobackup::manage_cron,
+  Stdlib::AbsolutePath      $backup_dir     = $pgprobackup::backup_dir,
+  String                    $backup_user    = $pgprobackup::backup_user,
+  String                    $ssh_key_fact   = $::pgprobackup_instance_key,
+  Stdlib::AbsolutePath      $log_file       = '/var/log/pgprobackup.log',
+  Hash                      $backups        = {},
+  String                    $version        = $::postgresql::globals::version,
+  String                    $package_name   = $pgprobackup::package_name,
+  Enum['present', 'absent'] $package_ensure = 'present',
   ) inherits ::pgprobackup {
 
   if !defined(Class['postgresql::server']) {
     fail('pgprobackup::instance requires the postgresql::server module installed and configured')
+  }
+
+  class {'pgprobackup::install':
+    version        => $version,
+    package_name   => $package_name,
+    package_ensure => $package_ensure,
   }
 
   $_seed = $seed ? {
@@ -108,7 +119,7 @@ class pgprobackup::instance(
   }
 
   if $manage_cron {
-    $binary = "[ -x /usr/bin/pg_probackup-${pgprobackup::version} ] && /usr/bin/pg_probackup-${pgprobackup::version}"
+    $binary = "[ -x /usr/bin/pg_probackup-${version} ] && /usr/bin/pg_probackup-${version}"
     if has_key($backups, 'FULL') {
       $full = $backups['FULL']
       @@cron { "pgprobackup_full_${server_address}":

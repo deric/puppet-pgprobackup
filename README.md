@@ -56,4 +56,4 @@ pgprobackup::instance::backups:
     weekday: 1-6
 ```
 
-There are many shared parameters between `instance` and `catalog`. Such parameters are defined in `pgprobackup::` namespace, such as `pgprobackup::version` (major release version, respect PostgreSQL releases: `11`, `12` etc.).
+There are many shared parameters between `instance` and `catalog`. Such parameters are defined in `pgprobackup::` namespace, such as `pgprobackup::package_name` (base package name to be installed on both instance and catalog).

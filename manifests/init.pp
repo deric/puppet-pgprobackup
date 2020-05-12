@@ -10,8 +10,6 @@
 #   Database created on DB instance
 # @param db_user
 #   PostgreSQL role used for connecting to DB instance/replication.
-# @param version
-#   Main PostgreSQL version, to be appended to `package_name`
 # @param debug_symbols
 #   Whether to install package with debugging symbols
 # @param debug_suffix
@@ -32,7 +30,6 @@
 class pgprobackup(
   String               $package_name,
   String               $package_ensure   = 'present',
-  String               $version          = '12',
   String               $host_group       = 'common',
   String               $db_name          = 'backup',
   String               $db_user          = 'backup',
@@ -49,8 +46,5 @@ class pgprobackup(
 ) {
 
   contain pgprobackup::repo
-  contain pgprobackup::install
 
-  Class['pgprobackup::repo']
-  -> Class['pgprobackup::install']
 }

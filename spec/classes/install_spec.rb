@@ -2,17 +2,22 @@
 
 require 'spec_helper'
 
-describe 'pgprobackup' do
+describe 'pgprobackup::install' do
+  let(:pre_condition) { 'include pgprobackup' }
+
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
       let(:facts) { os_facts }
 
-      it { is_expected.to compile }
-
-      it { is_expected.to contain_class('pgprobackup::install') }
+      let(:params) do
+        {
+          version: '12',
+        }
+      end
 
       case os_facts[:os]['family']
       when 'Debian'
+        it { is_expected.to compile }
         it {
           is_expected.to contain_package('pg-probackup-12').with(
             ensure: 'present',
@@ -39,6 +44,7 @@ describe 'pgprobackup' do
       context 'disable installing debug symbols' do
         let(:params) do
           {
+            version: '12',
             debug_symbols: false,
           }
         end

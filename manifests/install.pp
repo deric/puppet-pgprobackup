@@ -1,24 +1,21 @@
 # @api private
-class pgprobackup::install {
+class pgprobackup::install(
+  String                    $version,
+  Enum['present', 'absent'] $package_ensure = 'present',
+  String                    $package_name = $pgprobackup::package_name,
+  Boolean                   $debug_symbols = true,
+  ) {
 
-  $package_ensure = $pgprobackup::package_ensure
-  $_package_name = "${pgprobackup::package_name}-${pgprobackup::version}"
+  $_package_name = "${package_name}-${version}"
 
-  $_package_ensure = $package_ensure ? {
-    true     => 'present',
-    false    => 'purged',
-    'absent' => 'purged',
-    default => $package_ensure,
-  }
-
-  if $pgprobackup::debug_symbols {
+  if $debug_symbols {
     $_packages = [$_package_name, "${_package_name}-${pgprobackup::debug_suffix}"]
   } else {
     $_packages = [$_package_name]
   }
 
   ensure_packages($_packages, {
-    ensure  => $_package_ensure,
+    ensure  => $package_ensure,
     tag     => 'pgprobackup',
   })
 

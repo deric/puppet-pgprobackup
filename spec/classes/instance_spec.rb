@@ -15,6 +15,12 @@ describe 'pgprobackup::instance' do
       )
     end
 
+    let(:params) do
+      {
+        version: '12',
+      }
+    end
+
     it { is_expected.to compile }
     it { is_expected.to contain_class('pgprobackup::install') }
     it { is_expected.to contain_class('pgprobackup::repo') }
@@ -49,6 +55,7 @@ describe 'pgprobackup::instance' do
           backups: {
             FULL: {},
           },
+          version: '12',
         }
       end
 
@@ -73,6 +80,7 @@ describe 'pgprobackup::instance' do
               minute: '13',
             },
           },
+          version: '12',
         }
       end
 
@@ -94,6 +102,7 @@ describe 'pgprobackup::instance' do
           backups: {
             DELTA: {},
           },
+          version: '12',
         }
       end
 
