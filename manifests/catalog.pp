@@ -123,10 +123,23 @@ class pgprobackup::catalog (
   }
 
   if $manage_hba {
+    # sufficient for full backup with enabled WAL archiving
     @@postgresql::server::pg_hba_rule { "pgprobackup ${::hostname} access":
       description => "pgprobackup ${::hostname} access",
       type        => 'host',
       database    => $pgprobackup::db_name,
+      user        => $pgprobackup::db_user,
+      address     => $exported_ipaddress,
+      auth_method => 'md5',
+      order       => $hba_entry_order,
+      tag         => "pgprobackup-${host_group}",
+    }
+
+    # needed for streaming backups or full backup with --stream option
+    @@postgresql::server::pg_hba_rule { "pgprobackup ${::hostname} replication":
+      description => "pgprobackup ${::hostname} replication",
+      type        => 'host',
+      database    => 'replication',
       user        => $pgprobackup::db_user,
       address     => $exported_ipaddress,
       auth_method => 'md5',
