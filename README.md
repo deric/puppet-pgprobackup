@@ -25,7 +25,7 @@ Module touches many resources, including PostgreSQL configuration that might req
 
  - Puppet >= 5
  - PostgreSQL instance >= 9.5
- - `puppetlabs/postgresql` is expected to managed PostgreSQL instance
+ - `puppetlabs/postgresql` is expected to manage the PostgreSQL instance
 
 ## Usage
 
@@ -37,6 +37,15 @@ include pgprobackup::catalog
 DB server:
 ```puppet
 include pgprobackup::instance
+```
+Configure `pgprobackup` to run full backup every Sunday (via CRON job):
+```yaml
+pgprobackup::manage_cron: true
+pgprobackup::instance::backups:
+  FULL:
+    hour: 3
+    minute: 15
+    weekday: 0 # same as `7` or `Sunday`
 ```
 
 There are many shared parameters between `instance` and `catalog`. Such parameters are defined in `pgprobackup::` namespace, such as `pgprobackup::version` (major release version, respect PostgreSQL releases: `11`, `12` etc.).

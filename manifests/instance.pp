@@ -28,9 +28,12 @@ class pgprobackup::instance(
   Boolean $manage_host_keys              = $pgprobackup::manage_host_keys,
   Boolean $manage_pgpass                 = $pgprobackup::manage_pgpass,
   Boolean $manage_hba                    = $pgprobackup::manage_hba,
+  Boolean $manage_cron                   = $pgprobackup::manage_cron,
   Stdlib::AbsolutePath $backup_dir       = $pgprobackup::backup_dir,
   String               $backup_user      = $pgprobackup::backup_user,
   String               $ssh_key_fact     = $::pgprobackup_instance_key,
+  Stdlib::AbsolutePath $log_file         = '/var/log/pgprobackup.log',
+  Hash                 $backups          = {},
   ) inherits ::pgprobackup {
 
   if !defined(Class['postgresql::server']) {
@@ -94,13 +97,34 @@ class pgprobackup::instance(
     Sshkey <<| tag == "pgprobackup-${host_group}" |>>
 
     # Export own host key
-    @@sshkey { "postgres-${id}":
+    @@sshkey { "postgres-${server_address}":
       ensure       => present,
       host_aliases => [$::hostname, $::fqdn, $::ipaddress, $server_address],
       key          => $::sshecdsakey,
       type         => $pgprobackup::host_key_type,
       #target       => "${backup_dir}/.ssh/known_hosts",
       tag          => "pgprobackup-${host_group}-instance",
+    }
+  }
+
+  if $manage_cron {
+    if has_key($backups, 'FULL') {
+      $full = $backups['FULL']
+      @@cron { "pgprobackup_full_${::fqdn}":
+        command  => @(CMD/L),
+        [ -x /usr/bin/pg_probackup-${pgprobackup::version} ] &&
+        /usr/bin/pg_probackup-${pgprobackup::version} --instance ${id} -b FULL
+        --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name}
+        >> ${log_file} 2>&1
+        | -CMD
+        user     => $backup_user,
+        weekday  => pick($full['weekday'], undef),
+        hour     => pick($full['hour'], '4'),
+        minute   => pick($full['minute'], '00'),
+        month    => pick($full['month'], undef),
+        monthday => pick($full['monthday'], undef),
+        tag      => "pgprobackup-${host_group}",
+      }
     }
   }
 }

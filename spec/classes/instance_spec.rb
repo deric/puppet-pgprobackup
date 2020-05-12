@@ -42,5 +42,50 @@ describe 'pgprobackup::instance' do
         )
       }
     end
+
+    context 'with enabled FULL backup' do
+      let(:params) do
+        {
+          backups: {
+            FULL: {},
+          },
+        }
+      end
+
+      it {
+        expect(exported_resources).to contain_cron('pgprobackup_full_psql.localhost')
+          .with(
+            user: 'pgbackup',
+            monthday: '*',
+            weekday: '*',
+            hour: '4',
+            minute: '00',
+          )
+      }
+    end
+
+    context 'with customized CRON schedule' do
+      let(:params) do
+        {
+          backups: {
+            FULL: {
+              hour: '1',
+              minute: '13',
+            },
+          },
+        }
+      end
+
+      it {
+        expect(exported_resources).to contain_cron('pgprobackup_full_psql.localhost')
+          .with(
+            user: 'pgbackup',
+            monthday: '*',
+            weekday: '*',
+            hour: '1',
+            minute: '13',
+          )
+      }
+    end
   end
 end

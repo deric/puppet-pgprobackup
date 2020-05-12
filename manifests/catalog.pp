@@ -29,6 +29,7 @@ class pgprobackup::catalog (
   Boolean                   $manage_host_keys = $pgprobackup::manage_host_keys,
   Boolean                   $manage_pgpass = $pgprobackup::manage_pgpass,
   Boolean                   $manage_hba = $pgprobackup::manage_hba,
+  Boolean                   $manage_cron = $pgprobackup::manage_cron,
   Optional[Integer]         $uid = undef,
   String                    $host_group = $pgprobackup::host_group,
   Integer                   $hba_entry_order = 50,
@@ -160,6 +161,11 @@ class pgprobackup::catalog (
       key    => $ssh_key_splitted[1],
       tag    => "pgprobackup-${host_group}",
     }
+  }
+
+  if $manage_cron {
+    # Collect backup jobs to run
+    Cron <<| tag == "pgprobackup-${host_group}" |>>
   }
 
 }
