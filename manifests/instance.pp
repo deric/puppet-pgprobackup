@@ -116,11 +116,11 @@ class pgprobackup::instance(
         /usr/bin/pg_probackup-${pgprobackup::version} --instance ${id} -b FULL
         --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name}
         >> ${log_file} 2>&1
-        | -CMD
+        | CMD
         user     => $backup_user,
         weekday  => pick($full['weekday'], '*'),
-        hour     => pick($full['hour'], '4'),
-        minute   => pick($full['minute'], '00'),
+        hour     => pick($full['hour'], 4),
+        minute   => pick($full['minute'], 0),
         month    => pick($full['month'], '*'),
         monthday => pick($full['monthday'], '*'),
         tag      => "pgprobackup-${host_group}",
@@ -135,13 +135,13 @@ class pgprobackup::instance(
         /usr/bin/pg_probackup-${pgprobackup::version} --instance ${id} -b DELTA
         --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name}
         >> ${log_file} 2>&1
-        | -CMD
+        | CMD
         user     => $backup_user,
-        weekday  => pick($delta['weekday'], '*'),
-        hour     => pick($delta['hour'], '4'),
-        minute   => pick($delta['minute'], '00'),
-        month    => pick($delta['month'], '*'),
-        monthday => pick($delta['monthday'], '*'),
+        #weekday  => pick($delta['weekday'], '*'),
+        hour     => pick($delta['hour'], 4),
+        minute   => pick($delta['minute'], 0),
+        #month    => pick($delta['month'], '*'),
+        #monthday => pick($delta['monthday'], '*'),
         tag      => "pgprobackup-${host_group}",
       }
     }

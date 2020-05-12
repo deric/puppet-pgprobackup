@@ -59,7 +59,7 @@ describe 'pgprobackup::instance' do
             monthday: '*',
             weekday: '*',
             hour: '4',
-            minute: '00',
+            minute: '0',
           )
       }
     end
@@ -101,10 +101,8 @@ describe 'pgprobackup::instance' do
         expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost')
           .with(
             user: 'pgbackup',
-            monthday: '*',
-            weekday: '*',
             hour: '4',
-            minute: '00',
+            minute: '0',
           )
       }
     end
