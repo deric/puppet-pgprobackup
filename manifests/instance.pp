@@ -108,15 +108,13 @@ class pgprobackup::instance(
   }
 
   if $manage_cron {
+    $binary = "[ -x /usr/bin/pg_probackup-${pgprobackup::version} ] && /usr/bin/pg_probackup-${pgprobackup::version}"
     if has_key($backups, 'FULL') {
       $full = $backups['FULL']
       @@cron { "pgprobackup_full_${server_address}":
-        command  => @(CMD/L),
-        [ -x /usr/bin/pg_probackup-${pgprobackup::version} ] &&
-        /usr/bin/pg_probackup-${pgprobackup::version} --instance ${id} -b FULL
-        --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name}
-        >> ${log_file} 2>&1
-        | CMD
+        command  => @("CMD"/L),
+        ${binary} --instance ${id} -b FULL --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} >> ${log_file} 2>&1
+        | -CMD
         user     => $backup_user,
         weekday  => pick($full['weekday'], '*'),
         hour     => pick($full['hour'], 4),
@@ -130,18 +128,15 @@ class pgprobackup::instance(
     if has_key($backups, 'DELTA') {
       $delta = $backups['DELTA']
       @@cron { "pgprobackup_delta_${server_address}":
-        command  => @(CMD/L),
-        [ -x /usr/bin/pg_probackup-${pgprobackup::version} ] &&
-        /usr/bin/pg_probackup-${pgprobackup::version} --instance ${id} -b DELTA
-        --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name}
-        >> ${log_file} 2>&1
-        | CMD
+        command  => @("CMD"/L),
+        ${binary} --instance ${id} -b DELTA --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} >> ${log_file} 2>&1
+        | -CMD
         user     => $backup_user,
-        #weekday  => pick($delta['weekday'], '*'),
+        weekday  => pick($delta['weekday'], '*'),
         hour     => pick($delta['hour'], 4),
         minute   => pick($delta['minute'], 0),
-        #month    => pick($delta['month'], '*'),
-        #monthday => pick($delta['monthday'], '*'),
+        month    => pick($delta['month'], '*'),
+        monthday => pick($delta['monthday'], '*'),
         tag      => "pgprobackup-${host_group}",
       }
     }
