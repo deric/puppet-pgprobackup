@@ -69,6 +69,20 @@ class pgprobackup::instance(
       superuser     => false,
       replication   => true,
     }
+
+    case $version {
+      # TODO: add support for 9.5 and 9.6
+      '10','11','12': {
+        class {'pgprobackup::grants::psql10':
+          db_name => $db_name,
+          db_user => $db_user,
+        }
+      }
+      default: {
+        fail("PostgreSQL ${version} not supported")
+      }
+    }
+
   }
 
   # Collect resources exported by pgprobackup::catalog
