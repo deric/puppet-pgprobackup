@@ -38,31 +38,7 @@ jobs:
       env: PUPPET_GEM_VERSION="~> 6.0" CHECK=parallel_spec
       rvm: 2.5.7
       stage: spec
-    -
-      env: BEAKER_PUPPET_COLLECTION=puppet5 BEAKER_setfile=debian9-64 CHECK=beaker
-      rvm: 2.5.7
-      bundler_args: --without development release
-      services: docker
-      stage: acceptance
-    -
-      env: BEAKER_PUPPET_COLLECTION=puppet6 BEAKER_setfile=debian9-64 CHECK=beaker
-      rvm: 2.5.7
-      bundler_args: --without development release
-      services: docker
-      stage: acceptance
-    -
-      env: BEAKER_PUPPET_COLLECTION=puppet5 BEAKER_setfile=debian10-64 CHECK=beaker
-      rvm: 2.5.7
-      bundler_args: --without development release
-      services: docker
-      stage: acceptance
-    -
-      env: BEAKER_PUPPET_COLLECTION=puppet6 BEAKER_setfile=debian10-64 CHECK=beaker
-      rvm: 2.5.7
-      bundler_args: --without development release
-      services: docker
-      stage: acceptance
-    -
+   -
       env: DEPLOY_TO_FORGE=yes
       stage: deploy
 branches:
