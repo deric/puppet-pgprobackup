@@ -70,12 +70,18 @@ class pgprobackup::instance(
       replication   => true,
     }
 
+    postgresql::server::database { $db_name:
+      owner   => $db_user,
+      require => Postgresql::Server::Role[$db_user],
+    }
+
     case $version {
       # TODO: add support for 9.5 and 9.6
       '10','11','12': {
         class {'pgprobackup::grants::psql10':
           db_name => $db_name,
           db_user => $db_user,
+          require => Postgresql::Server::Database[$db_name],
         }
       }
       default: {
