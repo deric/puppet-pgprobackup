@@ -29,10 +29,11 @@ Module touches many resources, including PostgreSQL configuration that might req
 
 ## Usage
 
-Backup server:
+Backup server (where backup data will be stored) requires packages for all different PostgreSQL version that are running the same `host_group`, e.g. `pg_probackup-11`, `pg_probackup-12`.
 ```puppet
 include pgprobackup::catalog
 ```
+NOTE: Package version `catalog` and `instance` needs to be exactly the same!
 
 DB server:
 ```puppet

@@ -52,19 +52,12 @@ describe 'pgprobackup::catalog' do
     }
 
     it {
-      is_expected.to contain_file('/var/log/pgprobackup.log')
-        .with(ensure: 'present',
+      is_expected.to contain_file('/var/lib/pgbackup/log')
+        .with(ensure: 'directory',
               owner: 'pgbackup',
               group: 'pgbackup'
             )
     }
 
-    it {
-      is_expected.to contain_file('/etc/logrotate.d/pgprobackup')
-        .with(ensure: 'present',
-              owner: 'root',
-              group: 'pgbackup'
-            )
-    }
   end
 end

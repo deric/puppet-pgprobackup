@@ -19,7 +19,9 @@
 #   include pgprobackup::catalog
 class pgprobackup::catalog (
   Stdlib::AbsolutePath      $backup_dir = $pgprobackup::backup_dir,
-  Stdlib::AbsolutePath      $log_file = $pgprobackup::log_file,
+  Stdlib::AbsolutePath      $log_dir = $pgprobackup::log_dir,
+  String                    $log_file = $pgprobackup::log_file,
+  String                    $log_level = $pgprobackup::log_level,
   String                    $logrotate_template = 'pgprobackup/logrotate.conf.erb',
   String                    $exported_ipaddress = "${::ipaddress}/32",
   String                    $user = $pgprobackup::backup_user,
@@ -75,18 +77,10 @@ class pgprobackup::catalog (
     require => File[$backup_dir],
   }
 
-  file { $log_file:
-    ensure  => present,
+  file { $log_dir:
+    ensure  => directory,
     owner   => $user,
     group   => $group,
-  }
-
-  file { '/etc/logrotate.d/pgprobackup':
-    ensure  => present,
-    owner   => 'root',
-    group   => $group,
-    mode    => '0644',
-    content => template($logrotate_template),
   }
 
   if $manage_ssh_keys {

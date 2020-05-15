@@ -34,7 +34,9 @@ class pgprobackup::instance(
   Stdlib::AbsolutePath      $backup_dir     = $pgprobackup::backup_dir,
   String                    $backup_user    = $pgprobackup::backup_user,
   String                    $ssh_key_fact   = $::pgprobackup_instance_key,
-  Stdlib::AbsolutePath      $log_file       = $pgprobackup::log_file,
+  Stdlib::AbsolutePath      $log_dir        = $pgprobackup::log_dir,
+  String                    $log_file       = $pgprobackup::log_file,
+  String                    $log_level      = $pgprobackup::log_level,
   Hash                      $backups        = {},
   String                    $version        = $::postgresql::globals::version,
   String                    $package_name   = $pgprobackup::package_name,
@@ -140,11 +142,12 @@ class pgprobackup::instance(
 
   if $manage_cron {
     $binary = "[ -x /usr/bin/pg_probackup-${version} ] && /usr/bin/pg_probackup-${version}"
+    $logging = "--log-filename=${log_dir}/${log_file} --log-level-file=${log_level}"
     if has_key($backups, 'FULL') {
       $full = $backups['FULL']
       @@cron { "pgprobackup_full_${server_address}":
         command  => @("CMD"/L),
-        ${binary} --instance ${id} -b FULL --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} >> ${log_file} 2>&1
+        ${binary} --instance ${id} -b FULL --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}
         | -CMD
         user     => $backup_user,
         weekday  => pick($full['weekday'], '*'),
@@ -160,7 +163,7 @@ class pgprobackup::instance(
       $delta = $backups['DELTA']
       @@cron { "pgprobackup_delta_${server_address}":
         command  => @("CMD"/L),
-        ${binary} --instance ${id} -b DELTA --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} >> ${log_file} 2>&1
+        ${binary} --instance ${id} -b DELTA --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}
         | -CMD
         user     => $backup_user,
         weekday  => pick($delta['weekday'], '*'),
