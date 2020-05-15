@@ -118,6 +118,8 @@ class pgprobackup::catalog (
     File_line <<| tag == "pgprobackup-${host_group}" |>>
   }
 
+  Exec <<| tag == "pgprobackup_add_instance-${host_group}" |>>
+
   if $manage_host_keys {
     # Import db instances host keys
     Sshkey <<| tag == "pgprobackup-${host_group}-instance" |>>

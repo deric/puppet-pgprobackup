@@ -20,6 +20,7 @@ class pgprobackup::instance(
   String  $id                               = $::hostname,
   String  $host_group                       = $pgprobackup::host_group,
   String  $server_address                   = $::fqdn,
+  String  $cluster                          = 'main',
   Integer $server_port                      = 5432,
   Boolean $manage_dbuser                    = true,
   String  $db_name                          = $pgprobackup::db_name,
@@ -91,6 +92,13 @@ class pgprobackup::instance(
       }
     }
 
+  }
+
+  @@exec { "pgprobackup_add_instance_${::fqdn}":
+    command => "pg_probackup-${version} add-instance -B ${backup_dir} --instance '${id}' --remote-host=${server_address} --remote-user=postgres -D /var/lib/postgresql/${version}/${cluster}",
+    path    => ['/usr/bin'],
+    onlyif  => "test ! -d ${backup_dir}/backups/${id}",
+    tag    => "pgprobackup-${host_group}",
   }
 
   # Collect resources exported by pgprobackup::catalog
