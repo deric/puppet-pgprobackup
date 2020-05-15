@@ -34,7 +34,7 @@ class pgprobackup::instance(
   Stdlib::AbsolutePath      $backup_dir     = $pgprobackup::backup_dir,
   String                    $backup_user    = $pgprobackup::backup_user,
   String                    $ssh_key_fact   = $::pgprobackup_instance_key,
-  Stdlib::AbsolutePath      $log_file       = '/var/log/pgprobackup.log',
+  Stdlib::AbsolutePath      $log_file       = $pgprobackup::log_file,
   Hash                      $backups        = {},
   String                    $version        = $::postgresql::globals::version,
   String                    $package_name   = $pgprobackup::package_name,

@@ -50,5 +50,21 @@ describe 'pgprobackup::catalog' do
               group: 'pgbackup',
               mode: '0750')
     }
+
+    it {
+      is_expected.to contain_file('/var/log/pgprobackup.log')
+        .with(ensure: 'present',
+              owner: 'pgbackup',
+              group: 'pgbackup'
+            )
+    }
+
+    it {
+      is_expected.to contain_file('/etc/logrotate.d/pgprobackup')
+        .with(ensure: 'present',
+              owner: 'root',
+              group: 'pgbackup'
+            )
+    }
   end
 end
