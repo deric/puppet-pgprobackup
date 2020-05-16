@@ -154,7 +154,6 @@ class pgprobackup::instance(
       type         => $pgprobackup::host_key_type,
       target       => "${backup_dir}/.ssh/known_hosts",
       tag          => "pgprobackup-${host_group}-instance",
-      require      => File["${backup_dir}/.ssh"],
     }
   }
 
