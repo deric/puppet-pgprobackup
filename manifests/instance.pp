@@ -32,6 +32,7 @@ class pgprobackup::instance(
   Boolean $manage_pgpass                    = $pgprobackup::manage_pgpass,
   Boolean $manage_hba                       = $pgprobackup::manage_hba,
   Boolean $manage_cron                      = $pgprobackup::manage_cron,
+  Boolean $archive_wal                      = false,
   Stdlib::AbsolutePath      $backup_dir     = $pgprobackup::backup_dir,
   String                    $backup_user    = $pgprobackup::backup_user,
   String                    $ssh_key_fact   = $::pgprobackup_instance_key,
@@ -95,7 +96,7 @@ class pgprobackup::instance(
   }
 
   @@exec { "pgprobackup_add_instance_${::fqdn}":
-    command => "pg_probackup-${version} add-instance -B ${backup_dir} --instance '${id}' --remote-host=${server_address} --remote-user=postgres -D /var/lib/postgresql/${version}/${cluster}",
+    command => "pg_probackup-${version} add-instance -B ${backup_dir} --instance ${id} --remote-host=${server_address} --remote-user=postgres -D /var/lib/postgresql/${version}/${cluster}",
     path    => ['/usr/bin'],
     onlyif  => "test ! -d ${backup_dir}/backups/${id}",
     tag    => "pgprobackup_add_instance-${host_group}",
@@ -157,12 +158,19 @@ class pgprobackup::instance(
 
   if $manage_cron {
     $binary = "[ -x /usr/bin/pg_probackup-${version} ] && /usr/bin/pg_probackup-${version}"
+    $backup_cmd = "backup -B ${backup_dir}"
+    if $archive_wal {
+      $stream = ''
+    } else {
+      # with disabled WAL archiving, stream backup is needed
+      $stream = '--stream '
+    }
     $logging = "--log-filename=${log_dir}/${log_file} --log-level-file=${log_level}"
     if has_key($backups, 'FULL') {
       $full = $backups['FULL']
       @@cron { "pgprobackup_full_${server_address}":
         command  => @("CMD"/L),
-        ${binary} --instance ${id} -b FULL --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}
+        ${binary} ${backup_cmd} --instance ${id} -b FULL ${stream}--remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}
         | -CMD
         user     => $backup_user,
         weekday  => pick($full['weekday'], '*'),
@@ -178,7 +186,7 @@ class pgprobackup::instance(
       $delta = $backups['DELTA']
       @@cron { "pgprobackup_delta_${server_address}":
         command  => @("CMD"/L),
-        ${binary} --instance ${id} -b DELTA --remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}
+        ${binary} ${backup_cmd} --instance ${id} -b DELTA ${stream}--remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}
         | -CMD
         user     => $backup_user,
         weekday  => pick($delta['weekday'], '*'),
