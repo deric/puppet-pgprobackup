@@ -99,7 +99,8 @@ class pgprobackup::instance(
     command => "pg_probackup-${version} add-instance -B ${backup_dir} --instance ${id} --remote-host=${server_address} --remote-user=postgres -D /var/lib/postgresql/${version}/${cluster}",
     path    => ['/usr/bin'],
     onlyif  => "test ! -d ${backup_dir}/backups/${id}",
-    tag    => "pgprobackup_add_instance-${host_group}",
+    tag     => "pgprobackup_add_instance-${host_group}",
+    require => Package["${package_name}-${version}"],
   }
 
   # Collect resources exported by pgprobackup::catalog

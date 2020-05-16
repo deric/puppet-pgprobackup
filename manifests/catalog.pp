@@ -87,9 +87,9 @@ class pgprobackup::catalog (
   }
 
   file { $log_dir:
-    ensure  => directory,
-    owner   => $user,
-    group   => $group,
+    ensure => directory,
+    owner  => $user,
+    group  => $group,
   }
 
   if $manage_ssh_keys {
