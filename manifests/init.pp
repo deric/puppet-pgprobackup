@@ -45,7 +45,7 @@ class pgprobackup(
   Boolean              $manage_pgpass    = true,
   Boolean              $manage_hba       = true,
   Boolean              $manage_cron      = true,
-  String               $host_key_type    = 'ecdsa-sha2-nistp521',
+  String               $host_key_type    = 'ecdsa-sha2-nistp256',
 ) {
 
   contain pgprobackup::repo
