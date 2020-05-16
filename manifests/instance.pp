@@ -13,7 +13,7 @@
 # @param manage_dbuser
 #   Whether role for running backups should be managed.
 # @param version
-#   Major PostgreSQL release version
+#   Major PostgreSQL release version for installing pg_probackup package
 # @example
 #   include pgprobackup::instance
 class pgprobackup::instance(
@@ -49,7 +49,7 @@ class pgprobackup::instance(
   }
 
   class {'pgprobackup::install':
-    version        => $version,
+    versions       => [$version],
     package_name   => $package_name,
     package_ensure => $package_ensure,
   }

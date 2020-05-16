@@ -11,7 +11,7 @@ describe 'pgprobackup::install' do
 
       let(:params) do
         {
-          version: '12',
+          versions: ['12'],
         }
       end
 
@@ -44,7 +44,7 @@ describe 'pgprobackup::install' do
       context 'disable installing debug symbols' do
         let(:params) do
           {
-            version: '12',
+            versions: ['12'],
             debug_symbols: false,
           }
         end
@@ -52,11 +52,21 @@ describe 'pgprobackup::install' do
         case os_facts[:os]['family']
         when 'Debian'
           it {
+            is_expected.to contain_package('pg-probackup-12').with(
+              ensure: 'present',
+            )
+          }
+          it {
             is_expected.not_to contain_package('pg-probackup-12-dbg').with(
               ensure: 'present',
             )
           }
         when 'RedHat'
+          it {
+            is_expected.to contain_package('pg_probackup-12').with(
+              ensure: 'present',
+            )
+          }
           it {
             is_expected.not_to contain_package('pg_probackup-12-debuginfo').with(
               ensure: 'present',
@@ -68,7 +78,7 @@ describe 'pgprobackup::install' do
       context 'when installing specific version' do
         let(:params) do
           {
-            version: '11',
+            versions: ['11'],
           }
         end
 
@@ -92,6 +102,40 @@ describe 'pgprobackup::install' do
           }
           it {
             is_expected.to contain_package('pg_probackup-11-debuginfo').with(
+              ensure: 'present',
+            )
+          }
+        end
+      end
+
+      context 'when installing multiple packages' do
+        let(:params) do
+          {
+            versions: ['11','12'],
+            debug_symbols: false,
+          }
+        end
+
+        case os_facts[:os]['family']
+        when 'Debian'
+          it {
+            is_expected.to contain_package('pg-probackup-11').with(
+              ensure: 'present',
+            )
+          }
+          it {
+            is_expected.to contain_package('pg-probackup-12').with(
+              ensure: 'present',
+            )
+          }
+        when 'RedHat'
+          it {
+            is_expected.to contain_package('pg_probackup-11').with(
+              ensure: 'present',
+            )
+          }
+          it {
+            is_expected.to contain_package('pg_probackup-12').with(
               ensure: 'present',
             )
           }

@@ -106,7 +106,7 @@ describe 'pgprobackup::instance' do
         }
       end
 
-      cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12'\
+      cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
       ' --instance foo -b DELTA --remote-host=psql.localhost --remote-user=postgres'\
       ' -U backup -d backup --log-filename=/var/lib/pgbackup/log/pgprobackup.log'\
       ' --log-level-file=info'

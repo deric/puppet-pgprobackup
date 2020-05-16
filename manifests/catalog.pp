@@ -38,7 +38,16 @@ class pgprobackup::catalog (
   String                    $host_group = $pgprobackup::host_group,
   Integer                   $hba_entry_order = 50,
   String                    $ssh_key_fact = $::pgprobackup_catalog_key,
+  String                    $package_name = $pgprobackup::package_name,
+  Array[String]             $versions = ['12'],
+  Enum['present', 'absent'] $package_ensure = 'present',
 ) inherits ::pgprobackup {
+
+  class {'pgprobackup::install':
+    versions       => $versions,
+    package_name   => $package_name,
+    package_ensure => $package_ensure,
+  }
 
   group { $group:
     ensure => $user_ensure,
