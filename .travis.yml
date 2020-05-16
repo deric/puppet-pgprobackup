@@ -20,7 +20,6 @@ rvm:
 stages:
   - static
   - spec
-  - acceptance
   -
     if: tag =~ ^v\d
     name: deploy
