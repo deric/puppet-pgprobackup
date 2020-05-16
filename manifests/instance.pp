@@ -165,7 +165,7 @@ class pgprobackup::instance(
       # with disabled WAL archiving, stream backup is needed
       $stream = '--stream '
     }
-    $logging = "--log-filename=${log_dir}/${log_file} --log-level-file=${log_level}"
+    $logging = "--log-filename=${log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
     if has_key($backups, 'FULL') {
       $full = $backups['FULL']
       @@cron { "pgprobackup_full_${server_address}":

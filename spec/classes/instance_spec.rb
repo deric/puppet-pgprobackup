@@ -109,8 +109,8 @@ describe 'pgprobackup::instance' do
       cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
       ' -B /var/lib/pgbackup --instance foo -b DELTA --stream'\
       ' --remote-host=psql.localhost --remote-user=postgres'\
-      ' -U backup -d backup --log-filename=/var/lib/pgbackup/log/pgprobackup.log'\
-      ' --log-level-file=info'
+      ' -U backup -d backup --log-filename=pgprobackup.log'\
+      ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'
 
       it {
         expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost')
