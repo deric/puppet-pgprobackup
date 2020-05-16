@@ -33,7 +33,7 @@ Backup server (where backup data will be stored) requires packages for all diffe
 ```puppet
 include pgprobackup::catalog
 ```
-NOTE: Package version `catalog` and `instance` needs to be exactly the same!
+NOTE: Package version `catalog` and `instance` needs to be exactly the same! (e.g. `2.3.3-1.6a736c2db6402d77`).
 
 DB server:
 ```puppet
@@ -58,3 +58,18 @@ pgprobackup::instance::backups:
 ```
 
 There are many shared parameters between `instance` and `catalog`. Such parameters are defined in `pgprobackup::` namespace, such as `pgprobackup::package_name` (base package name to be installed on both instance and catalog).
+
+
+## Limitations
+
+Error message on `catalog` server:
+```
+Could not find resource 'Package[pg-probackup-11]' in parameter 'require'
+```
+
+means, that the server requires packages for all different Postgresql versions that are being backed up.
+```
+pgprobackup::catalog::versions:
+  - '11'
+  - '12'
+```

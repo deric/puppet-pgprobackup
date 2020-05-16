@@ -140,7 +140,7 @@ class pgprobackup::catalog (
       key          => $::sshecdsakey,
       type         => $pgprobackup::host_key_type,
       target       => '/var/lib/postgresql/.ssh/known_hosts',
-      tag          => "pgprobackup-${host_group}",
+      tag          => "pgprobackup-catalog-${host_group}",
     }
   }
 
