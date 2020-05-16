@@ -55,8 +55,7 @@ describe 'pgprobackup::catalog' do
       is_expected.to contain_file('/var/lib/pgbackup/log')
         .with(ensure: 'directory',
               owner: 'pgbackup',
-              group: 'pgbackup'
-            )
+              group: 'pgbackup')
     }
 
     case os_facts[:os]['family']
@@ -73,6 +72,5 @@ describe 'pgprobackup::catalog' do
         )
       }
     end
-
   end
 end

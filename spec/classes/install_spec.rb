@@ -111,7 +111,7 @@ describe 'pgprobackup::install' do
       context 'when installing multiple packages' do
         let(:params) do
           {
-            versions: ['11','12'],
+            versions: ['11', '12'],
             debug_symbols: false,
           }
         end
