@@ -10,6 +10,8 @@
 #   Address used for connecting to the DB server
 # @param server_port
 #   DB port
+# @param db_dir
+#   PostgreSQL home directory
 # @param manage_dbuser
 #   Whether role for running backups should be managed.
 # @param version
@@ -23,6 +25,7 @@ class pgprobackup::instance(
   String  $cluster                          = 'main',
   Integer $server_port                      = 5432,
   Boolean $manage_dbuser                    = true,
+  String  $db_dir                           = '/var/lib/postgresql',
   String  $db_name                          = $pgprobackup::db_name,
   String  $db_user                          = $pgprobackup::db_user,
   String  $db_password                      = '',
@@ -96,7 +99,7 @@ class pgprobackup::instance(
   }
 
   @@exec { "pgprobackup_add_instance_${::fqdn}":
-    command => "su - ${backup_user} -c \"pg_probackup-${version} add-instance -B ${backup_dir} --instance ${id} --remote-host=${server_address} --remote-user=postgres -D /var/lib/postgresql/${version}/${cluster}\"",
+    command => "su - ${backup_user} -c \"pg_probackup-${version} add-instance -B ${backup_dir} --instance ${id} --remote-host=${server_address} --remote-user=postgres -D ${db_dir}/${version}/${cluster}\"",
     path    => ['/usr/bin'],
     onlyif  => "test ! -d ${backup_dir}/backups/${id}",
     tag     => "pgprobackup_add_instance-${host_group}",
