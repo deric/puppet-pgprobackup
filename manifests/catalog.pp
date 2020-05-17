@@ -20,7 +20,6 @@
 class pgprobackup::catalog (
   Stdlib::AbsolutePath      $backup_dir = $pgprobackup::backup_dir,
   Stdlib::AbsolutePath      $log_dir = $pgprobackup::log_dir,
-  String                    $log_file = $pgprobackup::log_file,
   String                    $log_level = $pgprobackup::log_level,
   String                    $logrotate_template = 'pgprobackup/logrotate.conf.erb',
   String                    $exported_ipaddress = "${::ipaddress}/32",

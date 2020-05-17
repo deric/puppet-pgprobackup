@@ -38,7 +38,6 @@ class pgprobackup(
   Stdlib::AbsolutePath $backup_dir       = '/var/lib/pgbackup',
   String               $backup_user      = 'pgbackup',
   Stdlib::AbsolutePath $log_dir          = '/var/lib/pgbackup/log',
-  String               $log_file         = 'pgprobackup.log',
   String               $log_level        = 'info',
   Boolean              $manage_ssh_keys  = true,
   Boolean              $manage_host_keys = true,

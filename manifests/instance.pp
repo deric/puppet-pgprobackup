@@ -40,7 +40,7 @@ class pgprobackup::instance(
   String                    $backup_user    = $pgprobackup::backup_user,
   String                    $ssh_key_fact   = $::pgprobackup_instance_key,
   Stdlib::AbsolutePath      $log_dir        = $pgprobackup::log_dir,
-  String                    $log_file       = $pgprobackup::log_file,
+  Optional[String]          $log_file       = undef,
   String                    $log_level      = $pgprobackup::log_level,
   Hash                      $backups        = {},
   String                    $version        = $::postgresql::globals::version,
@@ -96,6 +96,13 @@ class pgprobackup::instance(
       }
     }
 
+  }
+
+  if $log_file {
+    $_log_file = $log_file
+  } else {
+    # use file per db instance
+    $_log_file = "${id}.log"
   }
 
   @@exec { "pgprobackup_add_instance_${::fqdn}":
@@ -169,7 +176,7 @@ class pgprobackup::instance(
       # with disabled WAL archiving, stream backup is needed
       $stream = '--stream '
     }
-    $logging = "--log-filename=${log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
+    $logging = "--log-filename=${_log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
     if has_key($backups, 'FULL') {
       $full = $backups['FULL']
       @@cron { "pgprobackup_full_${server_address}":
