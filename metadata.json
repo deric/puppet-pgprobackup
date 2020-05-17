@@ -10,14 +10,16 @@
       "name": "puppetlabs/apt",
       "version_requirement": ">= 2.0.0 < 8.0.0"
     },
-    { "name": "puppetlabs/cron_core",
+    {
+      "name": "puppetlabs/cron_core",
       "version_requirement": "> 1.0.0"
     },
     {
       "name": "puppetlabs/postgresql",
       "version_requirement": ">=6.3.0 <7.0.0"
     },
-    { "name": "puppetlabs/sshkeys_core",
+    {
+      "name": "puppetlabs/sshkeys_core",
       "version_requirement": "> 1.0.0"
     },
     {
