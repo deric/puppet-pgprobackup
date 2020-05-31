@@ -16,36 +16,54 @@
 #   Whether role for running backups should be managed.
 # @param version
 #   Major PostgreSQL release version for installing pg_probackup package
+# @param backups
+#   Hash with backups schedule
+# @example
+#   pgprobackup::instance::schedule:
+#     FULL:
+#       hour: 3
+#       minute: 15
+#       weekday: 0
+#     DELTA:
+#       hour: 0
+#       minute: 45
+#
+# @param retention_redundancy
+#   The number of full backup copies to keep in the backup catalog.
+# @param retention_window
+#   Defines the earliest point in time for which pg_probackup can complete the recovery.
 # @example
 #   include pgprobackup::instance
 class pgprobackup::instance(
-  String  $id                               = $::hostname,
-  String  $host_group                       = $pgprobackup::host_group,
-  String  $server_address                   = $::fqdn,
-  String  $cluster                          = 'main',
-  Integer $server_port                      = 5432,
-  Boolean $manage_dbuser                    = true,
-  String  $db_dir                           = '/var/lib/postgresql',
-  String  $db_name                          = $pgprobackup::db_name,
-  String  $db_user                          = $pgprobackup::db_user,
-  String  $db_password                      = '',
-  Optional[String] $seed                    = undef,
-  Boolean $manage_ssh_keys                  = $pgprobackup::manage_ssh_keys,
-  Boolean $manage_host_keys                 = $pgprobackup::manage_host_keys,
-  Boolean $manage_pgpass                    = $pgprobackup::manage_pgpass,
-  Boolean $manage_hba                       = $pgprobackup::manage_hba,
-  Boolean $manage_cron                      = $pgprobackup::manage_cron,
-  Boolean $archive_wal                      = false,
-  Stdlib::AbsolutePath      $backup_dir     = $pgprobackup::backup_dir,
-  String                    $backup_user    = $pgprobackup::backup_user,
-  String                    $ssh_key_fact   = $::pgprobackup_instance_key,
-  Stdlib::AbsolutePath      $log_dir        = $pgprobackup::log_dir,
-  Optional[String]          $log_file       = undef,
-  String                    $log_level      = $pgprobackup::log_level,
-  Hash                      $backups        = {},
-  String                    $version        = $::postgresql::globals::version,
-  String                    $package_name   = $pgprobackup::package_name,
-  Enum['present', 'absent'] $package_ensure = 'present',
+  String                    $id                   = $::hostname,
+  String                    $host_group           = $pgprobackup::host_group,
+  String                    $server_address       = $::fqdn,
+  String                    $cluster              = 'main',
+  Integer                   $server_port          = 5432,
+  Boolean                   $manage_dbuser        = true,
+  String                    $db_dir               = '/var/lib/postgresql',
+  String                    $db_name              = $pgprobackup::db_name,
+  String                    $db_user              = $pgprobackup::db_user,
+  String                    $db_password          = '',
+  Optional[String]          $seed                 = undef,
+  Boolean                   $manage_ssh_keys      = $pgprobackup::manage_ssh_keys,
+  Boolean                   $manage_host_keys     = $pgprobackup::manage_host_keys,
+  Boolean                   $manage_pgpass        = $pgprobackup::manage_pgpass,
+  Boolean                   $manage_hba           = $pgprobackup::manage_hba,
+  Boolean                   $manage_cron          = $pgprobackup::manage_cron,
+  Boolean                   $archive_wal          = false,
+  Stdlib::AbsolutePath      $backup_dir           = $pgprobackup::backup_dir,
+  String                    $backup_user          = $pgprobackup::backup_user,
+  String                    $ssh_key_fact         = $::pgprobackup_instance_key,
+  Stdlib::AbsolutePath      $log_dir              = $pgprobackup::log_dir,
+  Optional[String]          $log_file             = undef,
+  String                    $log_level            = $pgprobackup::log_level,
+  Hash                      $backups              = {},
+  String                    $version              = $::postgresql::globals::version,
+  String                    $package_name         = $pgprobackup::package_name,
+  Optional[Integer]         $retention_redundancy = undef,
+  Optional[Integer]         $retention_window     = undef,
+  Enum['present', 'absent'] $package_ensure       = 'present',
   ) inherits ::pgprobackup {
 
   if !defined(Class['postgresql::server']) {
@@ -171,18 +189,34 @@ class pgprobackup::instance(
   if $manage_cron {
     $binary = "[ -x /usr/bin/pg_probackup-${version} ] && /usr/bin/pg_probackup-${version}"
     $backup_cmd = "backup -B ${backup_dir}"
+
     if $archive_wal {
       $stream = ''
     } else {
       # with disabled WAL archiving, stream backup is needed
       $stream = '--stream '
     }
+
+    if $retention_redundancy {
+      $_retention_redundancy = " --retention-redundancy=${retention_redundancy}"
+    } else {
+      $_retention_redundancy = ''
+    }
+
+    if $retention_window {
+      $_retention_window = " --retention-window=${retention_window}"
+    } else {
+      $_retention_window = ''
+    }
+
+    $retention = "${_retention_redundancy}${_retention_window}"
+
     $logging = "--log-filename=${_log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
     if has_key($backups, 'FULL') {
       $full = $backups['FULL']
       @@cron { "pgprobackup_full_${server_address}":
         command  => @("CMD"/L),
-        ${binary} ${backup_cmd} --instance ${id} -b FULL ${stream}--remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}
+        ${binary} ${backup_cmd} --instance ${id} -b FULL ${stream}--remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}${retention}
         | -CMD
         user     => $backup_user,
         weekday  => pick($full['weekday'], '*'),
@@ -198,7 +232,7 @@ class pgprobackup::instance(
       $delta = $backups['DELTA']
       @@cron { "pgprobackup_delta_${server_address}":
         command  => @("CMD"/L),
-        ${binary} ${backup_cmd} --instance ${id} -b DELTA ${stream}--remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}
+        ${binary} ${backup_cmd} --instance ${id} -b DELTA ${stream}--remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}${retention}
         | -CMD
         user     => $backup_user,
         weekday  => pick($delta['weekday'], '*'),

@@ -35,6 +35,8 @@ include pgprobackup::catalog
 ```
 NOTE: Package version `catalog` and `instance` needs to be exactly the same! (e.g. `2.3.3-1.6a736c2db6402d77`).
 
+### Instance
+
 DB server:
 ```puppet
 include pgprobackup::instance
@@ -58,6 +60,9 @@ pgprobackup::instance::backups:
 ```
 
 There are many shared parameters between `instance` and `catalog`. Such parameters are defined in `pgprobackup::` namespace, such as `pgprobackup::package_name` (base package name to be installed on both instance and catalog).
+
+ * `retention_window` Defines the earliest point in time for which pg_probackup can complete the recovery.
+ * `retention_redundancy` The number of full backup copies to keep in the backup catalog.
 
 
 ## Limitations
