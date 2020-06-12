@@ -63,6 +63,8 @@ There are many shared parameters between `instance` and `catalog`. Such paramete
 
  * `retention_window` Defines the earliest point in time for which pg_probackup can complete the recovery.
  * `retention_redundancy` The number of full backup copies to keep in the backup catalog.
+ * `delete_expired` Delete expired backups when `retention_redundancy` or `retention_window` is set.
+ * `merge_expired` Merge expired backups when `retention_redundancy` or `retention_window` is set.
 
 
 ## Limitations

@@ -32,6 +32,10 @@
 #   The number of full backup copies to keep in the backup catalog.
 # @param retention_window
 #   Defines the earliest point in time for which pg_probackup can complete the recovery.
+# @param delete_expired
+#   Delete expired backups when `retention_redundancy` or `retention_window` is set.
+# @param merge_expired
+#   Merge expired backups when `retention_redundancy` or `retention_window` is set.
 # @example
 #   include pgprobackup::instance
 class pgprobackup::instance(
@@ -63,6 +67,8 @@ class pgprobackup::instance(
   String                    $package_name         = $pgprobackup::package_name,
   Optional[Integer]         $retention_redundancy = undef,
   Optional[Integer]         $retention_window     = undef,
+  Boolean                   $delete_expired       = true,
+  Boolean                   $merge_expired        = true,
   Enum['present', 'absent'] $package_ensure       = 'present',
   ) inherits ::pgprobackup {
 
@@ -209,7 +215,23 @@ class pgprobackup::instance(
       $_retention_window = ''
     }
 
-    $retention = "${_retention_redundancy}${_retention_window}"
+    if $retention_redundancy or $retention_window {
+      if $delete_expired {
+        $_dexpired = ' --delete-expired'
+      } else {
+        $_dexpired = ''
+      }
+      if $merge_expired {
+        $_mexpired = ' --merge-expired'
+      } else {
+        $_mexpired = ''
+      }
+      $expired = "${_dexpired}${_mexpired}"
+    } else {
+      $expired = ''
+    }
+
+    $retention = "${_retention_redundancy}${_retention_window}${expired}"
 
     $logging = "--log-filename=${_log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
     if has_key($backups, 'FULL') {

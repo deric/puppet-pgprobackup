@@ -139,6 +139,38 @@ describe 'pgprobackup::instance' do
       ' --remote-host=psql.localhost --remote-user=postgres'\
       ' -U backup -d backup --log-filename=foo.log'\
       ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+      ' --retention-redundancy=2 --retention-window=7 --delete-expired --merge-expired'
+
+      it {
+        expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost')
+          .with(
+            command: cmd,
+            user: 'pgbackup',
+            hour: '4',
+            minute: '0',
+          )
+      }
+    end
+
+    context 'with retention disabled merge and delete' do
+      let(:params) do
+        {
+          backups: {
+            DELTA: {},
+          },
+          version: '12',
+          retention_redundancy: 2,
+          retention_window: 7,
+          delete_expired: false,
+          merge_expired: false
+        }
+      end
+
+      cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
+      ' -B /var/lib/pgbackup --instance foo -b DELTA --stream'\
+      ' --remote-host=psql.localhost --remote-user=postgres'\
+      ' -U backup -d backup --log-filename=foo.log'\
+      ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
       ' --retention-redundancy=2 --retention-window=7'
 
       it {
