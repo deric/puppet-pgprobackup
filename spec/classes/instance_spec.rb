@@ -139,7 +139,7 @@ describe 'pgprobackup::instance' do
       ' --remote-host=psql.localhost --remote-user=postgres'\
       ' -U backup -d backup --log-filename=foo.log'\
       ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-      ' --retention-redundancy=2 --retention-window=7 --delete-expired --merge-expired'
+      ' --retention-redundancy=2 --retention-window=7 --delete-expired'
 
       it {
         expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost')
@@ -162,7 +162,7 @@ describe 'pgprobackup::instance' do
           retention_redundancy: 2,
           retention_window: 7,
           delete_expired: false,
-          merge_expired: false
+          merge_expired: true
         }
       end
 
@@ -171,7 +171,7 @@ describe 'pgprobackup::instance' do
       ' --remote-host=psql.localhost --remote-user=postgres'\
       ' -U backup -d backup --log-filename=foo.log'\
       ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-      ' --retention-redundancy=2 --retention-window=7'
+      ' --retention-redundancy=2 --retention-window=7 --merge-expired'
 
       it {
         expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost')
