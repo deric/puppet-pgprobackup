@@ -48,7 +48,7 @@ pgprobackup::instance::backups:
   FULL:
     hour: 3
     minute: 15
-    weekday: 0 # same as `7` or `Sunday`
+    weekday: [0] # same as `7` or `Sunday`
 ```
 Incremental (`DELTA`) backups every day except Sunday:
 ```yaml
@@ -56,7 +56,16 @@ pgprobackup::instance::backups:
   FULL:
     weekday: 0
   DELTA:
-    weekday: 1-6
+    weekday: [1-6]
+```
+
+Incremental (`DELTA`) backups every day except Friday, full backup on Friday:
+```yaml
+pgprobackup::instance::backups:
+  FULL:
+    weekday: 5
+  DELTA:
+    weekday: [0-4,6]
 ```
 
 There are many shared parameters between `instance` and `catalog`. Such parameters are defined in `pgprobackup::` namespace, such as `pgprobackup::package_name` (base package name to be installed on both instance and catalog).
