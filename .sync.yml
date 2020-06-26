@@ -1,0 +1,15 @@
+appveyor.yml:
+  delete: true
+Gemfile:
+  required:
+    ':development':
+      - gem: 'librarian-puppet'
+        platforms: ruby
+.gitignore:
+  paths:
+    - '.tmp/'
+    - '.librarian/'
+    - 'Puppetfile.lock'
+spec/spec_helper.rb:
+  mock_with: ':rspec'
+  coverage_report: true

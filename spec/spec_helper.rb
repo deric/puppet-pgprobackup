@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
+RSpec.configure do |c|
+  c.mock_with :rspec
+end
+
 require 'puppetlabs_spec_helper/module_spec_helper'
 require 'rspec-puppet-facts'
+
 require 'spec_helper_local' if File.file?(File.join(File.dirname(__FILE__), 'spec_helper_local.rb'))
 
 include RspecPuppetFacts
@@ -38,9 +43,9 @@ RSpec.configure do |c|
     # by default Puppet runs at warning level
     Puppet.settings[:strict] = :warning
   end
-  c.mock_with :rspec
   c.filter_run_excluding(bolt: true) unless ENV['GEM_BOLT']
   c.after(:suite) do
+    RSpec::Puppet::Coverage.report!(0)
   end
 end
 
@@ -52,7 +57,5 @@ def ensure_module_defined(module_name)
     last_module.const_get(next_module, false)
   end
 end
-
-at_exit { RSpec::Puppet::Coverage.report! }
 
 # 'spec_overrides' from sync.yml will appear below this line

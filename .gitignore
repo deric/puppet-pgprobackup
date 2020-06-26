@@ -1,7 +1,4 @@
 .git/
-/.librarian/
-/.tmp/
-Puppetfile.lock
 .*.sw[op]
 .metadata
 .yardoc
@@ -28,3 +25,6 @@ Puppetfile.lock
 .project
 .envrc
 /inventory.yaml
+.tmp/
+.librarian/
+Puppetfile.lock
