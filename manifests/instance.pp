@@ -69,7 +69,7 @@ class pgprobackup::instance(
   Optional[Integer]         $retention_window     = undef,
   Boolean                   $delete_expired       = true,
   Boolean                   $merge_expired        = false,
-  Enum['present', 'absent'] $package_ensure       = 'present',
+  Enum['present', 'absent'] $package_ensure       = $pgprobackup::package_ensure,
   ) inherits ::pgprobackup {
 
   if !defined(Class['postgresql::server']) {
