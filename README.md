@@ -37,7 +37,7 @@ NOTE: Package version `catalog` and `instance` needs to be exactly the same! (e.
 
 `pgprobackup::package_ensure` allows pinpointing to a specific version:
 ```puppet
-pgprobackup::package_ensure: 2.4.2-1.8db55b42aeece064.stretch
+pgprobackup::package_ensure: "2.4.2-1.8db55b42aeece064.%{facts.os.distro.codename}"
 ```
 
 ### Instance
