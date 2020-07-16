@@ -1,9 +1,9 @@
 # @api private
 class pgprobackup::install(
-  Array[String]             $versions = ['12'],
-  Enum['present', 'absent'] $package_ensure = 'present',
-  String                    $package_name = $pgprobackup::package_name,
-  Boolean                   $debug_symbols = true,
+  Array[String] $versions = ['12'],
+  String        $package_ensure = 'present',
+  String        $package_name = $pgprobackup::package_name,
+  Boolean       $debug_symbols = true,
   ) {
 
   $versions.each |String $version| {

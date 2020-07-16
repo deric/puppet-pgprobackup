@@ -162,7 +162,7 @@ describe 'pgprobackup::instance' do
           retention_redundancy: 2,
           retention_window: 7,
           delete_expired: false,
-          merge_expired: true
+          merge_expired: true,
         }
       end
 
@@ -182,6 +182,30 @@ describe 'pgprobackup::instance' do
             minute: '0',
           )
       }
+    end
+
+    context 'install specific package version' do
+      let(:params) do
+        {
+          version: '12',
+          package_ensure: '2.4.2-1.8db55b42aeece064.stretch',
+        }
+      end
+
+      case os_facts[:os]['family']
+      when 'Debian'
+        it {
+          is_expected.to contain_package('pg-probackup-12').with(
+            ensure: '2.4.2-1.8db55b42aeece064.stretch',
+          )
+        }
+      when 'RedHat'
+        it {
+          is_expected.to contain_package('pg_probackup-12').with(
+            ensure: '2.4.2-1.8db55b42aeece064.stretch',
+          )
+        }
+      end
     end
   end
 end

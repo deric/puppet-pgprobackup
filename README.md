@@ -35,6 +35,11 @@ include pgprobackup::catalog
 ```
 NOTE: Package version `catalog` and `instance` needs to be exactly the same! (e.g. `2.3.3-1.6a736c2db6402d77`).
 
+`pgprobackup::package_ensure` allows pinpointing to a specific version:
+```puppet
+pgprobackup::package_ensure: 2.4.2-1.8db55b42aeece064.stretch
+```
+
 ### Instance
 
 DB server:
