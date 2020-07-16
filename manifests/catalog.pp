@@ -39,7 +39,7 @@ class pgprobackup::catalog (
   String                    $ssh_key_fact = $::pgprobackup_catalog_key,
   String                    $package_name = $pgprobackup::package_name,
   Array[String]             $versions = ['12'],
-  Enum['present', 'absent'] $package_ensure = 'present',
+  String                    $package_ensure = $pgprobackup::package_ensure,
 ) inherits ::pgprobackup {
 
   class {'pgprobackup::install':

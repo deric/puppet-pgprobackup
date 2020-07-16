@@ -72,5 +72,29 @@ describe 'pgprobackup::catalog' do
         )
       }
     end
+
+    context 'when exact version is given' do
+      let(:params) do
+        {
+          package_ensure: '2.4.2-1.8db55b42aeece064',
+        }
+      end
+
+      case os_facts[:os]['family']
+      when 'Debian'
+        it {
+          is_expected.to contain_package('pg-probackup-12').with(
+            ensure: '2.4.2-1.8db55b42aeece064',
+          )
+        }
+      when 'RedHat'
+        it {
+          is_expected.to contain_package('pg_probackup-12').with(
+            ensure: '2.4.2-1.8db55b42aeece064',
+          )
+        }
+      end
+    end
+
   end
 end
