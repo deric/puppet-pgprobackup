@@ -14,6 +14,8 @@
 #   Whether ssh directory should be managed
 # @param host_group
 #   Allows to import only certain servers
+# @param purge_cron
+#   Whether remove unmanaged entries from crontab
 #
 # @example
 #   include pgprobackup::catalog
@@ -33,6 +35,7 @@ class pgprobackup::catalog (
   Boolean                   $manage_pgpass = $pgprobackup::manage_pgpass,
   Boolean                   $manage_hba = $pgprobackup::manage_hba,
   Boolean                   $manage_cron = $pgprobackup::manage_cron,
+  Boolean                   $purge_cron = true,
   Optional[Integer]         $uid = undef,
   String                    $host_group = $pgprobackup::host_group,
   Integer                   $hba_entry_order = 50,
@@ -186,6 +189,15 @@ class pgprobackup::catalog (
   if $manage_cron {
     # Collect backup jobs to run
     Cron <<| tag == "pgprobackup-${host_group}" |>>
+
+    # When enabled e.g. old entries will be removed
+    if $purge_cron {
+      resources { 'cron':
+        user  => $user,
+        purge => true,
+        noop  => true,
+      }
+    }
   }
 
 }
