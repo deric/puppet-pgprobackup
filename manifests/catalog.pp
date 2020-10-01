@@ -191,11 +191,8 @@ class pgprobackup::catalog (
     Cron <<| tag == "pgprobackup-${host_group}" |>>
 
     # When enabled e.g. old entries will be removed
-    if $purge_cron {
-      resources { 'cron':
-        purge => true,
-        noop  => true,
-      }
+    resources { 'cron':
+      purge => $purge_cron,
     }
   }
 
