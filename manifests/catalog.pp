@@ -193,7 +193,6 @@ class pgprobackup::catalog (
     # When enabled e.g. old entries will be removed
     if $purge_cron {
       resources { 'cron':
-        user  => $user,
         purge => true,
         noop  => true,
       }
