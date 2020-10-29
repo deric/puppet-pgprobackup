@@ -95,6 +95,5 @@ describe 'pgprobackup::catalog' do
         }
       end
     end
-
   end
 end
