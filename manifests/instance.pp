@@ -108,7 +108,7 @@ class pgprobackup::instance(
 
     case $version {
       # TODO: add support for 9.5 and 9.6
-      '10','11','12': {
+      '10','11','12','13': {
         class {'pgprobackup::grants::psql10':
           db_name => $db_name,
           db_user => $db_user,
