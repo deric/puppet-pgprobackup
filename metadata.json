@@ -1,10 +1,10 @@
 {
   "name": "deric-pgprobackup",
   "version": "0.1.0",
-  "author": "Tomas Barton",
-  "summary": "",
+  "author": "deric",
+  "summary": "Manage PostgreSQL database backups using pg_probackup tool",
   "license": "Apache-2.0",
-  "source": "",
+  "source": "https://github.com/deric/puppet-pgprobackup",
   "dependencies": [
     {
       "name": "puppetlabs/apt",
