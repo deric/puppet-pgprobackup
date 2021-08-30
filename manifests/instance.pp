@@ -36,6 +36,9 @@
 #   Delete expired backups when `retention_redundancy` or `retention_window` is set.
 # @param merge_expired
 #   Merge expired backups when `retention_redundancy` or `retention_window` is set.
+# @param threads
+#   Number of parallel threads
+#
 # @example
 #   include pgprobackup::instance
 class pgprobackup::instance(
@@ -69,6 +72,7 @@ class pgprobackup::instance(
   Optional[Integer]    $retention_window     = undef,
   Boolean              $delete_expired       = true,
   Boolean              $merge_expired        = false,
+  Optional[Integer]    $threads              = undef,
   String               $package_ensure       = $pgprobackup::package_ensure,
   ) inherits ::pgprobackup {
 
@@ -231,6 +235,12 @@ class pgprobackup::instance(
       $expired = ''
     }
 
+    if $threads {
+      $_threads = " --threads=${threads}"
+    } else {
+      $_threads = ''
+    }
+
     $retention = "${_retention_redundancy}${_retention_window}${expired}"
 
     $logging = "--log-filename=${_log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
@@ -238,7 +248,7 @@ class pgprobackup::instance(
       $full = $backups['FULL']
       @@cron { "pgprobackup_full_${server_address}":
         command  => @("CMD"/L),
-        ${binary} ${backup_cmd} --instance ${id} -b FULL ${stream}--remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}${retention}
+        ${binary} ${backup_cmd} --instance ${id} -b FULL ${stream}--remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}${retention}${_threads}
         | -CMD
         user     => $backup_user,
         weekday  => pick($full['weekday'], '*'),
@@ -254,7 +264,7 @@ class pgprobackup::instance(
       $delta = $backups['DELTA']
       @@cron { "pgprobackup_delta_${server_address}":
         command  => @("CMD"/L),
-        ${binary} ${backup_cmd} --instance ${id} -b DELTA ${stream}--remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}${retention}
+        ${binary} ${backup_cmd} --instance ${id} -b DELTA ${stream}--remote-host=${server_address} --remote-user=postgres -U ${db_user} -d ${db_name} ${logging}${retention}${_threads}
         | -CMD
         user     => $backup_user,
         weekday  => pick($delta['weekday'], '*'),
