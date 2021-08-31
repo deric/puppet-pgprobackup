@@ -323,6 +323,8 @@ describe 'pgprobackup::instance' do
         }
       end
 
+      it { is_expected.to contain_class('pgprobackup') }
+
       case os_facts[:os]['family']
       when 'Debian'
         it {
@@ -336,6 +338,8 @@ describe 'pgprobackup::instance' do
             ensure: '2.4.2-1.8db55b42aeece064.stretch',
           )
         }
+      else
+        it { is_expected.to compile.and_raise_error(%r{Unsupported managed repository for osfamily}) }
       end
     end
   end

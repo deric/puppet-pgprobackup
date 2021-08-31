@@ -15,6 +15,8 @@ describe 'pgprobackup::install' do
         }
       end
 
+      it { is_expected.to contain_class('pgprobackup') }
+
       case os_facts[:os]['family']
       when 'Debian'
         it { is_expected.to compile }
@@ -49,6 +51,8 @@ describe 'pgprobackup::install' do
           }
         end
 
+        it { is_expected.to contain_class('pgprobackup') }
+
         case os_facts[:os]['family']
         when 'Debian'
           it {
@@ -72,6 +76,8 @@ describe 'pgprobackup::install' do
               ensure: 'present',
             )
           }
+        else
+          it { is_expected.to compile.and_raise_error(%r{Unsupported managed repository for osfamily}) }
         end
       end
 
@@ -81,6 +87,8 @@ describe 'pgprobackup::install' do
             versions: ['11'],
           }
         end
+
+        it { is_expected.to contain_class('pgprobackup') }
 
         case os_facts[:os]['family']
         when 'Debian'
@@ -105,6 +113,8 @@ describe 'pgprobackup::install' do
               ensure: 'present',
             )
           }
+        else
+          it { is_expected.to compile.and_raise_error(%r{Unsupported managed repository for osfamily}) }
         end
       end
 
@@ -115,6 +125,8 @@ describe 'pgprobackup::install' do
             debug_symbols: false,
           }
         end
+
+        it { is_expected.to contain_class('pgprobackup') }
 
         case os_facts[:os]['family']
         when 'Debian'
@@ -139,6 +151,8 @@ describe 'pgprobackup::install' do
               ensure: 'present',
             )
           }
+        else
+          it { is_expected.to compile.and_raise_error(%r{Unsupported managed repository for osfamily}) }
         end
       end
     end
