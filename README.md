@@ -84,6 +84,7 @@ There are many shared parameters between `instance` and `catalog`. Such paramete
 
   * `threads` Number of parallel threads
   * `temp_slot` Whether to use temporary replication slot, which should guarantee that WAL won't be removed from primary server. In case of backup failure the slot will be removed (default `false`).
+  * `slot` Specifies the replication slot for WAL streaming. Can't be used together with `archive_wal=true`.
 
 
 ## Limitations

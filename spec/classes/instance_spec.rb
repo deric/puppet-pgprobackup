@@ -251,6 +251,38 @@ describe 'pgprobackup::instance' do
       end
     end
 
+    context 'with named replication slot' do
+      let(:params) do
+        {
+          backups: {
+            DELTA: {},
+            FULL: {},
+          },
+          version: '12',
+          slot: 'pg_probackup',
+        }
+      end
+
+      ['DELTA', 'FULL'].each do |backup|
+        cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
+        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' -U backup -d backup --log-filename=foo.log'\
+        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+        ' -S pg_probackup'
+
+        it {
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost")
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
+    end
+
     context 'install specific package version' do
       let(:params) do
         {
