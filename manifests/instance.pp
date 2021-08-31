@@ -42,7 +42,8 @@
 #   Use temporary replication slot
 # @param slot
 #   Replication slot name
-#
+# @param validate
+#   Whether backups should be validated after taking backup
 # @example
 #   include pgprobackup::instance
 class pgprobackup::instance(
@@ -79,6 +80,7 @@ class pgprobackup::instance(
   Optional[Integer]    $threads              = undef,
   Boolean              $temp_slot            = false,
   Optional[String]     $slot                 = undef,
+  Boolean              $validate             = true,
   String               $package_ensure       = $pgprobackup::package_ensure,
   ) inherits ::pgprobackup {
 
@@ -260,6 +262,12 @@ class pgprobackup::instance(
       $_slot = ''
     }
 
+    if $validate {
+      $_validate = ''
+    } else {
+      $_validate = ' --no-validate'
+    }
+
     $retention = "${_retention_redundancy}${_retention_window}${expired}"
 
     $logging = "--log-filename=${_log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
@@ -269,7 +277,7 @@ class pgprobackup::instance(
         command  => @("CMD"/L),
         ${binary} ${backup_cmd} --instance ${id} -b FULL ${stream}--remote-host=${server_address}\
          --remote-user=postgres -U ${db_user} -d ${db_name}\
-         ${logging}${retention}${_threads}${_temp_slot}${_slot}
+         ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}
         | -CMD
         user     => $backup_user,
         weekday  => pick($full['weekday'], '*'),
@@ -287,7 +295,7 @@ class pgprobackup::instance(
         command  => @("CMD"/L),
         ${binary} ${backup_cmd} --instance ${id} -b DELTA ${stream}--remote-host=${server_address}\
          --remote-user=postgres -U ${db_user} -d ${db_name}\
-         ${logging}${retention}${_threads}${_temp_slot}${_slot}
+         ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}
         | -CMD
         user     => $backup_user,
         weekday  => pick($delta['weekday'], '*'),
