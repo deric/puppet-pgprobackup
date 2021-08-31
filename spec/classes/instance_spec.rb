@@ -214,6 +214,36 @@ describe 'pgprobackup::instance' do
       }
     end
 
+    context 'use temp slot' do
+      let(:params) do
+        {
+          backups: {
+            DELTA: {},
+            FULL: {},
+          },
+          version: '12',
+          temp_slot: true,
+        }
+      end
+
+      cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
+      ' -B /var/lib/pgbackup --instance foo -b DELTA --stream'\
+      ' --remote-host=psql.localhost --remote-user=postgres'\
+      ' -U backup -d backup --log-filename=foo.log'\
+      ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+      ' --temp-slot'
+
+      it {
+        expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost')
+          .with(
+            command: cmd,
+            user: 'pgbackup',
+            hour: '4',
+            minute: '0',
+          )
+      }
+    end
+
     context 'install specific package version' do
       let(:params) do
         {

@@ -16,7 +16,7 @@ Module touches many resources, including PostgreSQL configuration that might req
  - database roles
  - role password
  - SSH host keys
- - SSH authorized keys (public SSH keys)
+ - SSH authorized keys (public SSH keys):wq
  - CRON jobs
  - user accounts
  - `pgprobackup` catalog
@@ -79,6 +79,11 @@ There are many shared parameters between `instance` and `catalog`. Such paramete
  * `retention_redundancy` The number of full backup copies to keep in the backup catalog.
  * `delete_expired` Delete expired backups when `retention_redundancy` or `retention_window` is set.
  * `merge_expired` Merge expired backups when `retention_redundancy` or `retention_window` is set.
+
+#### Instance parameters
+
+  * `threads` Number of parallel threads
+  * `temp_slot` Whether to use temporary replication slot, which should guarantee that WAL won't be removed from primary server (default `false`)
 
 
 ## Limitations
