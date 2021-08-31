@@ -16,7 +16,7 @@ Module touches many resources, including PostgreSQL configuration that might req
  - database roles
  - role password
  - SSH host keys
- - SSH authorized keys (public SSH keys):wq
+ - SSH authorized keys (public SSH keys)
  - CRON jobs
  - user accounts
  - `pgprobackup` catalog
@@ -83,7 +83,7 @@ There are many shared parameters between `instance` and `catalog`. Such paramete
 #### Instance parameters
 
   * `threads` Number of parallel threads
-  * `temp_slot` Whether to use temporary replication slot, which should guarantee that WAL won't be removed from primary server (default `false`)
+  * `temp_slot` Whether to use temporary replication slot, which should guarantee that WAL won't be removed from primary server. In case of backup failure the slot will be removed (default `false`).
 
 
 ## Limitations

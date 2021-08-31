@@ -157,6 +157,7 @@ describe 'pgprobackup::instance' do
         {
           backups: {
             DELTA: {},
+            FULL: {},
           },
           version: '12',
           retention_redundancy: 2,
@@ -166,22 +167,24 @@ describe 'pgprobackup::instance' do
         }
       end
 
-      cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
-      ' -B /var/lib/pgbackup --instance foo -b DELTA --stream'\
-      ' --remote-host=psql.localhost --remote-user=postgres'\
-      ' -U backup -d backup --log-filename=foo.log'\
-      ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-      ' --retention-redundancy=2 --retention-window=7 --merge-expired'
+      ['DELTA', 'FULL'].each do |backup|
+        cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
+        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' -U backup -d backup --log-filename=foo.log'\
+        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+        ' --retention-redundancy=2 --retention-window=7 --merge-expired'
 
-      it {
-        expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost')
-          .with(
-            command: cmd,
-            user: 'pgbackup',
-            hour: '4',
-            minute: '0',
-          )
-      }
+        it {
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost")
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
     end
 
     context 'with number of parallel threads' do
@@ -196,22 +199,24 @@ describe 'pgprobackup::instance' do
         }
       end
 
-      cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
-      ' -B /var/lib/pgbackup --instance foo -b DELTA --stream'\
-      ' --remote-host=psql.localhost --remote-user=postgres'\
-      ' -U backup -d backup --log-filename=foo.log'\
-      ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-      ' --threads=4'
+      ['DELTA', 'FULL'].each do |backup|
+        cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
+        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' -U backup -d backup --log-filename=foo.log'\
+        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+        ' --threads=4'
 
-      it {
-        expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost')
-          .with(
-            command: cmd,
-            user: 'pgbackup',
-            hour: '4',
-            minute: '0',
-          )
-      }
+        it {
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost")
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
     end
 
     context 'use temp slot' do
@@ -226,22 +231,24 @@ describe 'pgprobackup::instance' do
         }
       end
 
-      cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
-      ' -B /var/lib/pgbackup --instance foo -b DELTA --stream'\
-      ' --remote-host=psql.localhost --remote-user=postgres'\
-      ' -U backup -d backup --log-filename=foo.log'\
-      ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-      ' --temp-slot'
+      ['DELTA', 'FULL'].each do |backup|
+        cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
+        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' -U backup -d backup --log-filename=foo.log'\
+        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+        ' --temp-slot'
 
-      it {
-        expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost')
-          .with(
-            command: cmd,
-            user: 'pgbackup',
-            hour: '4',
-            minute: '0',
-          )
-      }
+        it {
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost")
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
     end
 
     context 'install specific package version' do
