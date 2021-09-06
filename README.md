@@ -91,6 +91,8 @@ There are many shared parameters between `instance` and `catalog`. Such paramete
   * `temp_slot` Whether to use temporary replication slot, which should guarantee that WAL won't be removed from primary server. In case of backup failure the slot will be removed (default `false`).
   * `slot` Specifies the replication slot for WAL streaming. Can't be used together with `archive_wal=true`.
   * `validate` Validate backup consistency after backup completition (default: `true`).
+  * `compress_algorithm` Currently supported algorithms `zlib` or `pglz` (default: 'none')
+  * `compress_level` `0-9` (defalt: `1`)
 
 
 ## Limitations

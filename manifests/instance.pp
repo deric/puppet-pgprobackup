@@ -82,6 +82,8 @@ class pgprobackup::instance(
   Optional[String]     $slot                 = undef,
   Boolean              $validate             = true,
   String               $package_ensure       = $pgprobackup::package_ensure,
+  Optional[String]     $compress_algorithm   = undef,
+  Integer              $compress_level       = 1,
   ) inherits ::pgprobackup {
 
   if !defined(Class['postgresql::server']) {
@@ -270,6 +272,12 @@ class pgprobackup::instance(
 
     $retention = "${_retention_redundancy}${_retention_window}${expired}"
 
+    if $compress_algorithm {
+      $_compress =" --compress-algorithm=${compress_algorithm} --compress-level=${compress_level}"
+    } else {
+      $_compress =''
+    }
+
     $logging = "--log-filename=${_log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
     if has_key($backups, 'FULL') {
       $full = $backups['FULL']
@@ -277,7 +285,7 @@ class pgprobackup::instance(
         command  => @("CMD"/L),
         ${binary} ${backup_cmd} --instance ${id} -b FULL ${stream}--remote-host=${server_address}\
          --remote-user=postgres -U ${db_user} -d ${db_name}\
-         ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}
+         ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}
         | -CMD
         user     => $backup_user,
         weekday  => pick($full['weekday'], '*'),
@@ -295,7 +303,7 @@ class pgprobackup::instance(
         command  => @("CMD"/L),
         ${binary} ${backup_cmd} --instance ${id} -b DELTA ${stream}--remote-host=${server_address}\
          --remote-user=postgres -U ${db_user} -d ${db_name}\
-         ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}
+         ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}
         | -CMD
         user     => $backup_user,
         weekday  => pick($delta['weekday'], '*'),
