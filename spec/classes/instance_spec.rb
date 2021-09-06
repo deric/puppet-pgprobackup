@@ -348,6 +348,38 @@ describe 'pgprobackup::instance' do
       end
     end
 
+    context 'configured archive-timeout' do
+      let(:params) do
+        {
+          backups: {
+            DELTA: {},
+            FULL: {},
+          },
+          version: '13',
+          archive_timeout: 600,
+        }
+      end
+
+      ['DELTA', 'FULL'].each do |backup|
+        cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
+        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' -U backup -d backup --log-filename=foo.log'\
+        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+        ' --archive-timeout=600'
+
+        it {
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost")
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
+    end
+
     context 'install specific package version' do
       let(:params) do
         {

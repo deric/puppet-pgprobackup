@@ -93,6 +93,7 @@ There are many shared parameters between `instance` and `catalog`. Such paramete
   * `validate` Validate backup consistency after backup completition (default: `true`).
   * `compress_algorithm` Currently supported algorithms `zlib` or `pglz` (default: 'none')
   * `compress_level` `0-9` (defalt: `1`)
+  * `archive_timeout` Timeout in seconds for copying all remaining WAL files (default `300`).
 
 
 ## Limitations
