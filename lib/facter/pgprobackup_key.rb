@@ -25,6 +25,6 @@ end
 Facter.add('pgprobackup_instance_key') do
   confine kernel: 'Linux'
   setcode do
-    barman_safe_keygen_and_return('postgres')
+    pgprobackup_keygen('postgres')
   end
 end
