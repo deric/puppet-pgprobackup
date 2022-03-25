@@ -8,7 +8,7 @@
   "dependencies": [
     {
       "name": "puppetlabs/apt",
-      "version_requirement": ">= 2.0.0 < 8.0.0"
+      "version_requirement": ">= 2.0.0 < 9.0.0"
     },
     {
       "name": "puppetlabs/cron_core",
@@ -16,7 +16,7 @@
     },
     {
       "name": "puppetlabs/postgresql",
-      "version_requirement": ">=6.3.0 <7.0.0"
+      "version_requirement": ">=6.3.0 <9.0.0"
     },
     {
       "name": "puppetlabs/sshkeys_core",
@@ -24,7 +24,7 @@
     },
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 2.3.3 < 7.0.0"
+      "version_requirement": ">= 2.3.3 < 9.0.0"
     },
     {
       "name": "puppetlabs/yumrepo_core",
