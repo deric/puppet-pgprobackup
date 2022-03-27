@@ -94,10 +94,6 @@ class pgprobackup::instance(
   Optional[Integer]    $archive_timeout      = undef,
   ) inherits ::pgprobackup {
 
-  if !defined(Class['postgresql::server']) {
-    fail('pgprobackup::instance requires the postgresql::server module installed and configured')
-  }
-
   class {'pgprobackup::install':
     versions       => [$version],
     package_name   => $package_name,
