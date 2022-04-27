@@ -56,11 +56,12 @@ describe 'pgprobackup::instance' do
             FULL: {},
           },
           version: '12',
+          host_groups: ['common']
         }
       end
 
       it {
-        expect(exported_resources).to contain_cron('pgprobackup_full_psql.localhost')
+        expect(exported_resources).to contain_cron('pgprobackup_full_psql.localhost-common')
           .with(
             user: 'pgbackup',
             monthday: '*',
@@ -81,11 +82,12 @@ describe 'pgprobackup::instance' do
             },
           },
           version: '12',
+          host_groups: ['common'],
         }
       end
 
       it {
-        expect(exported_resources).to contain_cron('pgprobackup_full_psql.localhost')
+        expect(exported_resources).to contain_cron('pgprobackup_full_psql.localhost-common')
           .with(
             user: 'pgbackup',
             monthday: '*',
@@ -103,6 +105,7 @@ describe 'pgprobackup::instance' do
             DELTA: {},
           },
           version: '12',
+          host_groups: ['common'],
         }
       end
 
@@ -113,7 +116,7 @@ describe 'pgprobackup::instance' do
       ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'
 
       it {
-        expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost')
+        expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost-common')
           .with(
             command: cmd,
             user: 'pgbackup',
@@ -122,6 +125,7 @@ describe 'pgprobackup::instance' do
           )
       }
     end
+
     context 'with retention options' do
       let(:params) do
         {
@@ -131,6 +135,7 @@ describe 'pgprobackup::instance' do
           version: '12',
           retention_redundancy: 2,
           retention_window: 7,
+          host_groups: ['common'],
         }
       end
 
@@ -142,7 +147,7 @@ describe 'pgprobackup::instance' do
       ' --retention-redundancy=2 --retention-window=7 --delete-expired'
 
       it {
-        expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost')
+        expect(exported_resources).to contain_cron('pgprobackup_delta_psql.localhost-common')
           .with(
             command: cmd,
             user: 'pgbackup',
@@ -164,6 +169,7 @@ describe 'pgprobackup::instance' do
           retention_window: 7,
           delete_expired: false,
           merge_expired: true,
+          host_groups: ['common'],
         }
       end
 
@@ -176,7 +182,7 @@ describe 'pgprobackup::instance' do
         ' --retention-redundancy=2 --retention-window=7 --merge-expired'
 
         it {
-          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost")
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost-common")
             .with(
               command: cmd,
               user: 'pgbackup',
@@ -196,6 +202,7 @@ describe 'pgprobackup::instance' do
           },
           version: '12',
           threads: 4,
+          host_groups: ['common'],
         }
       end
 
@@ -208,7 +215,7 @@ describe 'pgprobackup::instance' do
         ' --threads=4'
 
         it {
-          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost")
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost-common")
             .with(
               command: cmd,
               user: 'pgbackup',
@@ -228,6 +235,7 @@ describe 'pgprobackup::instance' do
           },
           version: '12',
           temp_slot: true,
+          host_groups: ['common'],
         }
       end
 
@@ -240,7 +248,7 @@ describe 'pgprobackup::instance' do
         ' --temp-slot'
 
         it {
-          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost")
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost-common")
             .with(
               command: cmd,
               user: 'pgbackup',
@@ -260,6 +268,7 @@ describe 'pgprobackup::instance' do
           },
           version: '12',
           slot: 'pg_probackup',
+          host_groups: ['common'],
         }
       end
 
@@ -272,7 +281,7 @@ describe 'pgprobackup::instance' do
         ' -S pg_probackup'
 
         it {
-          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost")
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost-common")
             .with(
               command: cmd,
               user: 'pgbackup',
@@ -292,6 +301,7 @@ describe 'pgprobackup::instance' do
           },
           version: '12',
           validate: false,
+          host_groups: ['common'],
         }
       end
 
@@ -304,7 +314,7 @@ describe 'pgprobackup::instance' do
         ' --no-validate'
 
         it {
-          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost")
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost-common")
             .with(
               command: cmd,
               user: 'pgbackup',
@@ -325,6 +335,7 @@ describe 'pgprobackup::instance' do
           version: '12',
           compress_algorithm: 'zlib',
           compress_level: 2,
+          host_groups: ['common'],
         }
       end
 
@@ -337,7 +348,7 @@ describe 'pgprobackup::instance' do
         ' --compress-algorithm=zlib --compress-level=2'
 
         it {
-          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost")
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost-common")
             .with(
               command: cmd,
               user: 'pgbackup',
@@ -357,6 +368,7 @@ describe 'pgprobackup::instance' do
           },
           version: '13',
           archive_timeout: 600,
+          host_groups: ['common'],
         }
       end
 
@@ -369,7 +381,7 @@ describe 'pgprobackup::instance' do
         ' --archive-timeout=600'
 
         it {
-          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost")
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost-common")
             .with(
               command: cmd,
               user: 'pgbackup',
@@ -377,6 +389,42 @@ describe 'pgprobackup::instance' do
               minute: '0',
             )
         }
+      end
+    end
+
+    context 'backup instance to multiple servers' do
+      backup_catalogs = [ 'b01', 'b02' ]
+      let(:params) do
+        {
+          backups: {
+            DELTA: {},
+            FULL: {},
+          },
+          version: '13',
+          archive_timeout: 600,
+          host_groups: backup_catalogs,
+        }
+      end
+
+      backup_catalogs.each do |catalog|
+        ['DELTA', 'FULL'].each do |backup|
+          cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
+          " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+          ' --remote-host=psql.localhost --remote-user=postgres'\
+          ' -U backup -d backup --log-filename=foo.log'\
+          ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+          ' --archive-timeout=600'
+
+          it {
+            expect(exported_resources).to contain_cron("pgprobackup_#{backup.downcase}_psql.localhost-#{catalog}")
+              .with(
+                command: cmd,
+                user: 'pgbackup',
+                hour: '4',
+                minute: '0',
+              )
+          }
+        end
       end
     end
 

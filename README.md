@@ -34,10 +34,20 @@ Module touches many resources, including PostgreSQL configuration that might req
 
 ## Usage
 
-Backup server (where backup data will be stored) requires packages for all different PostgreSQL version that are running the same `host_group`, e.g. `pg_probackup-11`, `pg_probackup-12`.
+Backup server(s) (where backup data will be stored) requires packages for all different PostgreSQL version that are running the same `host_group`, e.g. `pg_probackup-11`, `pg_probackup-12`.
 ```puppet
 include pgprobackup::catalog
 ```
+
+each backup server should define:
+```
+pgprobackup::catalog::host_group: eu-west
+# pg_probackup has dedicated binaries for each major PostgreSQL versions
+pgprobackup::catalog::versions:
+  - '13'
+  - '14'
+```
+
 NOTE: Package version `catalog` and `instance` needs to be exactly the same! (e.g. `2.3.3-1.6a736c2db6402d77`).
 
 `pgprobackup::package_ensure` allows pinpointing to a specific version:
@@ -77,6 +87,13 @@ pgprobackup::instance::backups:
   DELTA:
     weekday: [0-4,6]
 ```
+
+Target backup catalog servers (one database instance can be backed to multiple locations):
+```yaml
+pgprobackup::instance::host_groups:
+  - eu-west
+```
+
 
 There are many shared parameters between `instance` and `catalog`. Such parameters are defined in `pgprobackup::` namespace, such as `pgprobackup::package_name` (base package name to be installed on both instance and catalog).
 

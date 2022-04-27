@@ -4,8 +4,8 @@
 #
 # @param id
 #   Unique identifier within `host_group`
-# @param host_group
-#   Allows grouping DB servers to same backup server
+# @param host_groups
+#   Target backup servers where will be backups stored
 # @param server_address
 #   Address used for connecting to the DB server
 # @param server_port
@@ -55,7 +55,7 @@
 #   include pgprobackup::instance
 class pgprobackup::instance(
   String               $id                   = $::hostname,
-  String               $host_group           = $pgprobackup::host_group,
+  Array[String]        $host_groups          = [ $pgprobackup::host_group ],
   String               $server_address       = $::fqdn,
   String               $cluster              = 'main',
   Integer              $server_port          = 5432,
@@ -147,24 +147,20 @@ class pgprobackup::instance(
     $_log_file = "${id}.log"
   }
 
-  @@exec { "pgprobackup_add_instance_${::fqdn}":
-    command => "pg_probackup-${version} add-instance -B ${backup_dir} --instance ${id} --remote-host=${server_address} --remote-user=postgres -D ${db_dir}/${version}/${cluster}",
-    path    => ['/usr/bin'],
-    onlyif  => "test ! -d ${backup_dir}/backups/${id}",
-    tag     => "pgprobackup_add_instance-${host_group}",
-    user    => $backup_user, # note: error output might not be captured
-    require => Package["${package_name}-${version}"],
+
+  if $manage_host_keys {
+    # Export own host key
+    @@sshkey { "postgres-${server_address}":
+      ensure       => present,
+      host_aliases => [$::hostname, $::fqdn, $::ipaddress, $server_address],
+      key          => $::sshecdsakey,
+      type         => $pgprobackup::host_key_type,
+      target       => "${backup_dir}/.ssh/known_hosts",
+      tag          => "pgprobackup-instance",
+    }
   }
 
-  # Collect resources exported by pgprobackup::catalog
-  Postgresql::Server::Pg_hba_rule <<| tag == "pgprobackup-${host_group}" |>>
-
   if $manage_ssh_keys {
-    # Add public key from backup server as authorized
-    Ssh_authorized_key <<| tag == "pgprobackup-${host_group}" |>> {
-      require => Class['postgresql::server'],
-    }
-
     # Export own public SSH key
     if ($ssh_key_fact != undef and $ssh_key_fact != '') {
       $ssh_key_split = split($ssh_key_fact, ' ')
@@ -173,7 +169,7 @@ class pgprobackup::instance(
         user   => $backup_user,
         type   => $ssh_key_split[0],
         key    => $ssh_key_split[1],
-        tag    => "pgprobackup-${host_group}-instance",
+        tag    => "pgprobackup-instance",
       }
     }
   }
@@ -184,145 +180,157 @@ class pgprobackup::instance(
       path  => "${backup_dir}/.pgpass",
       line  => "${server_address}:${server_port}:${db_name}:${db_user}:${real_password}",
       match => "^${regexpescape($server_address)}:${server_port}:${db_name}:${db_user}",
-      tag   => "pgprobackup-${host_group}",
+      tag   => "pgprobackup-instance",
     }
 
     @@file_line { "pgprobackup_pgpass_replication-${id}":
       path  => "${backup_dir}/.pgpass",
       line  => "${server_address}:${server_port}:replication:${db_user}:${real_password}",
       match => "^${regexpescape($server_address)}:${server_port}:replication:${db_user}",
-      tag   => "pgprobackup-${host_group}",
+      tag   => "pgprobackup-instance",
     }
   }
 
-  if $manage_host_keys {
-    # Import backup server host key
-    Sshkey <<| tag == "pgprobackup-catalog-${host_group}" |>>
+  $host_groups.each |String $host_group| {
 
-    # Export own host key
-    @@sshkey { "postgres-${server_address}":
-      ensure       => present,
-      host_aliases => [$::hostname, $::fqdn, $::ipaddress, $server_address],
-      key          => $::sshecdsakey,
-      type         => $pgprobackup::host_key_type,
-      target       => "${backup_dir}/.ssh/known_hosts",
-      tag          => "pgprobackup-${host_group}-instance",
-    }
-  }
-
-  if $manage_cron {
-    $binary = "[ -x /usr/bin/pg_probackup-${version} ] && /usr/bin/pg_probackup-${version}"
-    $backup_cmd = "backup -B ${backup_dir}"
-
-    if $archive_wal {
-      $stream = ''
-    } else {
-      # with disabled WAL archiving, stream backup is needed
-      $stream = '--stream '
+    @@exec { "pgprobackup_add_instance_${::fqdn}-${host_group}":
+      command => "pg_probackup-${version} add-instance -B ${backup_dir} --instance ${id} --remote-host=${server_address} --remote-user=postgres -D ${db_dir}/${version}/${cluster}",
+      path    => ['/usr/bin'],
+      onlyif  => "test ! -d ${backup_dir}/backups/${id}",
+      tag     => "pgprobackup_add_instance-${host_group}",
+      user    => $backup_user, # note: error output might not be captured
+      require => Package["${package_name}-${version}"],
     }
 
-    if $retention_redundancy {
-      $_retention_redundancy = " --retention-redundancy=${retention_redundancy}"
-    } else {
-      $_retention_redundancy = ''
+    # Collect resources exported by pgprobackup::catalog
+    Postgresql::Server::Pg_hba_rule <<| tag == "pgprobackup-${host_group}" |>>
+
+    if $manage_ssh_keys {
+      # Import public key from backup server as authorized
+      Ssh_authorized_key <<| tag == "pgprobackup-${host_group}" |>> {
+        require => Class['postgresql::server'],
+      }
     }
 
-    if $retention_window {
-      $_retention_window = " --retention-window=${retention_window}"
-    } else {
-      $_retention_window = ''
+    if $manage_host_keys {
+      # Import backup server host key
+      Sshkey <<| tag == "pgprobackup-catalog-${host_group}" |>>
     }
 
-    if $retention_redundancy or $retention_window {
-      if $delete_expired {
-        $_dexpired = ' --delete-expired'
+    if $manage_cron {
+      $binary = "[ -x /usr/bin/pg_probackup-${version} ] && /usr/bin/pg_probackup-${version}"
+      $backup_cmd = "backup -B ${backup_dir}"
+
+      if $archive_wal {
+        $stream = ''
       } else {
-        $_dexpired = ''
+        # with disabled WAL archiving, stream backup is needed
+        $stream = '--stream '
       }
-      if $merge_expired {
-        $_mexpired = ' --merge-expired'
+
+      if $retention_redundancy {
+        $_retention_redundancy = " --retention-redundancy=${retention_redundancy}"
       } else {
-        $_mexpired = ''
+        $_retention_redundancy = ''
       }
-      $expired = "${_dexpired}${_mexpired}"
-    } else {
-      $expired = ''
-    }
 
-    if $threads {
-      $_threads = " --threads=${threads}"
-    } else {
-      $_threads = ''
-    }
-
-    # replication slots
-    if $temp_slot {
-      $_temp_slot = ' --temp-slot'
-    } else {
-      $_temp_slot = ''
-    }
-
-    if $slot {
-      $_slot = " -S ${slot}"
-    } else {
-      $_slot = ''
-    }
-
-    if $validate {
-      $_validate = ''
-    } else {
-      $_validate = ' --no-validate'
-    }
-
-    $retention = "${_retention_redundancy}${_retention_window}${expired}"
-
-    if $compress_algorithm {
-      $_compress =" --compress-algorithm=${compress_algorithm} --compress-level=${compress_level}"
-    } else {
-      $_compress =''
-    }
-
-    if $archive_timeout {
-      $_timeout = " --archive-timeout=${archive_timeout}"
-    } else {
-      $_timeout = ''
-    }
-
-    $logging = "--log-filename=${_log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
-    if has_key($backups, 'FULL') {
-      $full = $backups['FULL']
-      @@cron { "pgprobackup_full_${server_address}":
-        command  => @("CMD"/L),
-        ${binary} ${backup_cmd} --instance ${id} -b FULL ${stream}--remote-host=${server_address}\
-         --remote-user=postgres -U ${db_user} -d ${db_name}\
-         ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}${_timeout}
-        | -CMD
-        user     => $backup_user,
-        weekday  => pick($full['weekday'], '*'),
-        hour     => pick($full['hour'], 4),
-        minute   => pick($full['minute'], 0),
-        month    => pick($full['month'], '*'),
-        monthday => pick($full['monthday'], '*'),
-        tag      => "pgprobackup-${host_group}",
+      if $retention_window {
+        $_retention_window = " --retention-window=${retention_window}"
+      } else {
+        $_retention_window = ''
       }
-    }
 
-    if has_key($backups, 'DELTA') {
-      $delta = $backups['DELTA']
-      @@cron { "pgprobackup_delta_${server_address}":
-        command  => @("CMD"/L),
-        ${binary} ${backup_cmd} --instance ${id} -b DELTA ${stream}--remote-host=${server_address}\
-         --remote-user=postgres -U ${db_user} -d ${db_name}\
-         ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}${_timeout}
-        | -CMD
-        user     => $backup_user,
-        weekday  => pick($delta['weekday'], '*'),
-        hour     => pick($delta['hour'], 4),
-        minute   => pick($delta['minute'], 0),
-        month    => pick($delta['month'], '*'),
-        monthday => pick($delta['monthday'], '*'),
-        tag      => "pgprobackup-${host_group}",
+      if $retention_redundancy or $retention_window {
+        if $delete_expired {
+          $_dexpired = ' --delete-expired'
+        } else {
+          $_dexpired = ''
+        }
+        if $merge_expired {
+          $_mexpired = ' --merge-expired'
+        } else {
+          $_mexpired = ''
+        }
+        $expired = "${_dexpired}${_mexpired}"
+      } else {
+        $expired = ''
       }
-    }
-  }
+
+      if $threads {
+        $_threads = " --threads=${threads}"
+      } else {
+        $_threads = ''
+      }
+
+      # replication slots
+      if $temp_slot {
+        $_temp_slot = ' --temp-slot'
+      } else {
+        $_temp_slot = ''
+      }
+
+      if $slot {
+        $_slot = " -S ${slot}"
+      } else {
+        $_slot = ''
+      }
+
+      if $validate {
+        $_validate = ''
+      } else {
+        $_validate = ' --no-validate'
+      }
+
+      $retention = "${_retention_redundancy}${_retention_window}${expired}"
+
+      if $compress_algorithm {
+        $_compress =" --compress-algorithm=${compress_algorithm} --compress-level=${compress_level}"
+      } else {
+        $_compress =''
+      }
+
+      if $archive_timeout {
+        $_timeout = " --archive-timeout=${archive_timeout}"
+      } else {
+        $_timeout = ''
+      }
+
+      $logging = "--log-filename=${_log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
+      if has_key($backups, 'FULL') {
+        $full = $backups['FULL']
+        @@cron { "pgprobackup_full_${server_address}-${host_group}":
+          command  => @("CMD"/L),
+          ${binary} ${backup_cmd} --instance ${id} -b FULL ${stream}--remote-host=${server_address}\
+           --remote-user=postgres -U ${db_user} -d ${db_name}\
+           ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}${_timeout}
+          | -CMD
+          user     => $backup_user,
+          weekday  => pick($full['weekday'], '*'),
+          hour     => pick($full['hour'], 4),
+          minute   => pick($full['minute'], 0),
+          month    => pick($full['month'], '*'),
+          monthday => pick($full['monthday'], '*'),
+          tag      => "pgprobackup-${host_group}",
+        }
+      }
+
+      if has_key($backups, 'DELTA') {
+        $delta = $backups['DELTA']
+        @@cron { "pgprobackup_delta_${server_address}-${host_group}":
+          command  => @("CMD"/L),
+          ${binary} ${backup_cmd} --instance ${id} -b DELTA ${stream}--remote-host=${server_address}\
+           --remote-user=postgres -U ${db_user} -d ${db_name}\
+           ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}${_timeout}
+          | -CMD
+          user     => $backup_user,
+          weekday  => pick($delta['weekday'], '*'),
+          hour     => pick($delta['hour'], 4),
+          minute   => pick($delta['minute'], 0),
+          month    => pick($delta['month'], '*'),
+          monthday => pick($delta['monthday'], '*'),
+          tag      => "pgprobackup-${host_group}",
+        }
+      }
+    } # manage_cron
+  } # host_group
 }
