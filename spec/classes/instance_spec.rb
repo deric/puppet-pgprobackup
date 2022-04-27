@@ -12,6 +12,7 @@ describe 'pgprobackup::instance' do
       os_facts.merge(
         pgprobackup_instance_key: 'ssh-rsa AAABBBCCC',
         fqdn: 'psql.localhost',
+        manage_ssh_keys: true
       )
     end
 
@@ -31,6 +32,7 @@ describe 'pgprobackup::instance' do
           user: 'pgbackup',
           type: 'ssh-rsa',
           key: 'AAABBBCCC',
+          tag: ['pgprobackup-common'],
         )
     }
 
@@ -405,6 +407,17 @@ describe 'pgprobackup::instance' do
           host_groups: backup_catalogs,
         }
       end
+
+
+      it {
+        expect(exported_resources).to contain_ssh_authorized_key('postgres-psql.localhost')
+          .with(
+            user: 'pgbackup',
+            type: 'ssh-rsa',
+            key: 'AAABBBCCC',
+            tag: ['pgprobackup-b01','pgprobackup-b02']
+          )
+      }
 
       backup_catalogs.each do |catalog|
         ['DELTA', 'FULL'].each do |backup|

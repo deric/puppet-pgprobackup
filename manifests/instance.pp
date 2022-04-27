@@ -19,7 +19,7 @@
 # @param backups
 #   Hash with backups schedule
 # @example
-#   pgprobackup::instance::schedule:
+#   pgprobackup::instance::backups:
 #     FULL:
 #       hour: 3
 #       minute: 15
@@ -147,6 +147,10 @@ class pgprobackup::instance(
     $_log_file = "${id}.log"
   }
 
+  # tag all target catalogs
+  $tags = $host_groups.map|$group| {
+    "pgprobackup-${group}"
+  }
 
   if $manage_host_keys {
     # Export own host key
@@ -156,7 +160,7 @@ class pgprobackup::instance(
       key          => $::sshecdsakey,
       type         => $pgprobackup::host_key_type,
       target       => "${backup_dir}/.ssh/known_hosts",
-      tag          => "pgprobackup-instance",
+      tag          => $tags,
     }
   }
 
@@ -169,7 +173,7 @@ class pgprobackup::instance(
         user   => $backup_user,
         type   => $ssh_key_split[0],
         key    => $ssh_key_split[1],
-        tag    => "pgprobackup-instance",
+        tag    => $tags,
       }
     }
   }
@@ -180,14 +184,14 @@ class pgprobackup::instance(
       path  => "${backup_dir}/.pgpass",
       line  => "${server_address}:${server_port}:${db_name}:${db_user}:${real_password}",
       match => "^${regexpescape($server_address)}:${server_port}:${db_name}:${db_user}",
-      tag   => "pgprobackup-instance",
+      tag   => $tags,
     }
 
     @@file_line { "pgprobackup_pgpass_replication-${id}":
       path  => "${backup_dir}/.pgpass",
       line  => "${server_address}:${server_port}:replication:${db_user}:${real_password}",
       match => "^${regexpescape($server_address)}:${server_port}:replication:${db_user}",
-      tag   => "pgprobackup-instance",
+      tag   => $tags,
     }
   }
 
