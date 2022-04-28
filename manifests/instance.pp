@@ -221,7 +221,7 @@ class pgprobackup::instance(
       if $manage_cron {
 
           $config.each |$backup_type, $schedule| {
-
+          # declare cron job, use defaults from instance
           create_resources(pgprobackup::cron_backup, {"cron_backup-${host_group}-${server_address}-${backup_type}" => $schedule} , {
             id                   => $id,
             db_name              => $db_name,

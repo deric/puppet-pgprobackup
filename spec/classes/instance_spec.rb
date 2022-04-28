@@ -82,8 +82,9 @@ describe 'pgprobackup::instance' do
           backups: {
             common: {
               FULL: {
-                hour: '1',
-                minute: '13',
+                hour: 1,
+                minute: 13,
+                monthday: 1,
               },
             },
           },
@@ -98,6 +99,7 @@ describe 'pgprobackup::instance' do
             weekday: '*',
             hour: '1',
             minute: '13',
+            monthday: '1',
           )
       }
     end
@@ -411,12 +413,24 @@ describe 'pgprobackup::instance' do
         {
           backups: {
             'b01': {
-              DELTA: {},
-              FULL: {},
+              DELTA: {
+                hour: 3,
+                minute: 14,
+                weekday: ['0-2','4-6'],
+              },
+              FULL: {
+                hour: 6,
+                minute: 5,
+                weekday: 3,
+              },
             },
             'b02': {
-              DELTA: {},
-              FULL: {},
+              DELTA: {
+                weekday: ['0-6']
+              },
+              FULL: {
+                monthday: 1,
+              },
             }
           },
           version: '13',
@@ -434,26 +448,87 @@ describe 'pgprobackup::instance' do
           )
       }
 
-      backup_catalogs.each do |catalog|
-        ['DELTA', 'FULL'].each do |backup|
-          cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
-          " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-          ' --remote-host=psql.localhost --remote-user=postgres'\
-          ' -U backup -d backup --log-filename=foo.log'\
-          ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-          ' --archive-timeout=600'
 
-          it {
-            expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-#{catalog}")
-              .with(
-                command: cmd,
-                user: 'pgbackup',
-                hour: '4',
-                minute: '0',
-              )
-          }
-        end
+      it "has DELTA backup on b01" do
+        backup = 'DELTA'
+        cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
+        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' -U backup -d backup --log-filename=foo.log'\
+        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+        ' --archive-timeout=600'
+
+
+        expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b01")
+          .with(
+            command: cmd,
+            user: 'pgbackup',
+            hour: 3,
+            minute: 14,
+            weekday: ['0-2','4-6'],
+          )
       end
+
+      it "has FULL backup on b01" do
+        backup = 'FULL'
+        cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
+        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' -U backup -d backup --log-filename=foo.log'\
+        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+        ' --archive-timeout=600'
+
+
+        expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b01")
+          .with(
+            command: cmd,
+            user: 'pgbackup',
+            hour: 6,
+            minute: 5,
+            weekday: 3,
+          )
+      end
+
+      it "has DELTA backup on b02" do
+        backup = 'DELTA'
+        cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
+        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' -U backup -d backup --log-filename=foo.log'\
+        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+        ' --archive-timeout=600'
+
+
+        expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b02")
+          .with(
+            command: cmd,
+            user: 'pgbackup',
+            hour: 4,
+            minute: 0,
+            weekday: ['0-6'],
+          )
+      end
+
+      it "has FULL backup on b02" do
+        backup = 'FULL'
+        cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
+        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' -U backup -d backup --log-filename=foo.log'\
+        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+        ' --archive-timeout=600'
+
+
+        expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b02")
+          .with(
+            command: cmd,
+            user: 'pgbackup',
+            hour: 4,
+            minute: 0,
+            monthday: 1,
+          )
+      end
+
     end
 
     context 'install specific package version' do
