@@ -119,7 +119,7 @@ describe 'pgprobackup::instance' do
 
       cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
       ' -B /var/lib/pgbackup --instance foo -b DELTA --stream'\
-      ' --remote-host=psql.localhost --remote-user=postgres'\
+      ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
       ' -U backup -d backup --log-filename=foo.log'\
       ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'
 
@@ -150,7 +150,7 @@ describe 'pgprobackup::instance' do
 
       cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
       ' -B /var/lib/pgbackup --instance foo -b DELTA --stream'\
-      ' --remote-host=psql.localhost --remote-user=postgres'\
+      ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
       ' -U backup -d backup --log-filename=foo.log'\
       ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
       ' --retention-redundancy=2 --retention-window=7 --delete-expired'
@@ -186,7 +186,7 @@ describe 'pgprobackup::instance' do
       ['DELTA', 'FULL'].each do |backup|
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --retention-redundancy=2 --retention-window=7 --merge-expired'
@@ -220,7 +220,7 @@ describe 'pgprobackup::instance' do
       ['DELTA', 'FULL'].each do |backup|
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --threads=4'
@@ -254,7 +254,7 @@ describe 'pgprobackup::instance' do
       ['DELTA', 'FULL'].each do |backup|
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --temp-slot'
@@ -288,7 +288,7 @@ describe 'pgprobackup::instance' do
       ['DELTA', 'FULL'].each do |backup|
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' -S pg_probackup'
@@ -322,7 +322,7 @@ describe 'pgprobackup::instance' do
       ['DELTA', 'FULL'].each do |backup|
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --no-validate'
@@ -357,7 +357,7 @@ describe 'pgprobackup::instance' do
       ['DELTA', 'FULL'].each do |backup|
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --compress-algorithm=zlib --compress-level=2'
@@ -391,7 +391,7 @@ describe 'pgprobackup::instance' do
       ['DELTA', 'FULL'].each do |backup|
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --archive-timeout=600'
@@ -452,7 +452,7 @@ describe 'pgprobackup::instance' do
         backup = 'DELTA'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --archive-timeout=600'
@@ -471,7 +471,7 @@ describe 'pgprobackup::instance' do
         backup = 'FULL'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --archive-timeout=600'
@@ -490,7 +490,7 @@ describe 'pgprobackup::instance' do
         backup = 'DELTA'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --archive-timeout=600'
@@ -509,7 +509,7 @@ describe 'pgprobackup::instance' do
         backup = 'FULL'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --archive-timeout=600'
@@ -554,7 +554,7 @@ describe 'pgprobackup::instance' do
         backup = 'DELTA'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --threads=4 --compress-algorithm=zlib --compress-level=3 --archive-timeout=600'
@@ -571,7 +571,7 @@ describe 'pgprobackup::instance' do
         backup = 'FULL'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
-        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --retention-redundancy=2 --retention-window=7 --delete-expired --archive-timeout=600'

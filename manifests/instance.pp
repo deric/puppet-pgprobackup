@@ -257,6 +257,8 @@ class pgprobackup::instance(
             log_dir              => $log_dir,
             log_file             => $log_file,
             log_level            => $log_level,
+            remote_user          => $remote_user,
+            remote_port          => $remote_port,
           })
         }
       } # manage_cron

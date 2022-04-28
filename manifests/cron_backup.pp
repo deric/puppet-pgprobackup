@@ -10,6 +10,8 @@ define pgprobackup::cron_backup(
   String                          $db_user,
   String                          $version,
   String                          $backup_user,
+  String                          $remote_user,
+  Integer                         $remote_port,
   Stdlib::AbsolutePath            $backup_dir,
   Stdlib::AbsolutePath            $log_dir,
   String                          $log_level,
@@ -122,7 +124,7 @@ define pgprobackup::cron_backup(
     @@cron { "pgprobackup_${backup_type}_${server_address}-${host_group}":
       command  => @("CMD"/L),
       ${binary} ${backup_cmd} --instance ${id} -b ${backup_type} ${stream}--remote-host=${server_address}\
-       --remote-user=postgres -U ${db_user} -d ${db_name}\
+       --remote-user=${remote_user} --remote-port=${remote_port} -U ${db_user} -d ${db_name}\
        ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}${_timeout}
       | -CMD
       user     => $backup_user,
