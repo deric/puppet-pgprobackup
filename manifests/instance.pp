@@ -49,6 +49,10 @@
 #   Integer between 0 and 9 (default: `1`)
 # @param archive_timeout
 #   Timeout in seconds for copying all remaining WAL files.
+# @param remote_user
+#   user used for ssh connection to the DB instance
+# @param remote_port
+#   ssh port used for connection to the DB instance from catalog server
 #
 # @example
 #   include pgprobackup::instance
@@ -63,6 +67,8 @@ class pgprobackup::instance(
   String               $db_user              = $pgprobackup::db_user,
   String               $db_password          = '',
   Optional[String]     $seed                 = undef,
+  String               $remote_user          = 'postgres',
+  Integer              $remote_port          = 22,
   Boolean              $manage_ssh_keys      = $pgprobackup::manage_ssh_keys,
   Boolean              $manage_host_keys     = $pgprobackup::manage_host_keys,
   Boolean              $manage_pgpass        = $pgprobackup::manage_pgpass,
@@ -195,7 +201,11 @@ class pgprobackup::instance(
     $backups.each |String $host_group, Hash $config| {
 
       @@exec { "pgprobackup_add_instance_${::fqdn}-${host_group}":
-        command => "pg_probackup-${version} add-instance -B ${backup_dir} --instance ${id} --remote-host=${server_address} --remote-user=postgres -D ${db_dir}/${version}/${cluster}",
+        command => @("CMD"/L),
+        pg_probackup-${version} add-instance -B ${backup_dir} --instance ${id} \
+        --remote-host=${server_address} --remote-user=${remote_user} \
+        --remote-port=${remote_port} -D ${db_dir}/${version}/${cluster}
+        | -CMD
         path    => ['/usr/bin'],
         onlyif  => "test ! -d ${backup_dir}/backups/${id}",
         tag     => "pgprobackup_add_instance-${host_group}",
