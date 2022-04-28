@@ -55,10 +55,11 @@ describe 'pgprobackup::instance' do
       let(:params) do
         {
           backups: {
-            FULL: {},
+            common: {
+              FULL: {},
+            }
           },
           version: '12',
-          host_groups: ['common']
         }
       end
 
@@ -78,13 +79,14 @@ describe 'pgprobackup::instance' do
       let(:params) do
         {
           backups: {
-            FULL: {
-              hour: '1',
-              minute: '13',
+            common: {
+              FULL: {
+                hour: '1',
+                minute: '13',
+              },
             },
           },
           version: '12',
-          host_groups: ['common'],
         }
       end
 
@@ -104,10 +106,11 @@ describe 'pgprobackup::instance' do
       let(:params) do
         {
           backups: {
-            DELTA: {},
+            common: {
+              DELTA: {},
+            },
           },
           version: '12',
-          host_groups: ['common'],
         }
       end
 

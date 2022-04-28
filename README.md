@@ -40,8 +40,8 @@ include pgprobackup::catalog
 ```
 
 each backup server should define:
-```
-pgprobackup::catalog::host_group: eu-west
+```yaml
+pgprobackup::catalog::host_group: common
 # pg_probackup has dedicated binaries for each major PostgreSQL versions
 pgprobackup::catalog::versions:
   - '13'
@@ -65,33 +65,46 @@ Configure `pgprobackup` to run full backup every Sunday (via CRON job):
 ```yaml
 pgprobackup::manage_cron: true
 pgprobackup::instance::backups:
-  FULL:
-    hour: 3
-    minute: 15
-    weekday: [0] # same as `7` or `Sunday`
+  common:
+    FULL:
+      hour: 3
+      minute: 15
+      weekday: [0] # same as `7` or `Sunday`
 ```
 Incremental (`DELTA`) backups every day except Sunday:
 ```yaml
 pgprobackup::instance::backups:
-  FULL:
-    weekday: 0
-  DELTA:
-    weekday: [1-6]
+  common:
+    FULL:
+      weekday: 0
+    DELTA:
+      weekday: [1-6]
 ```
 
 Incremental (`DELTA`) backups every day except Friday, full backup on Friday:
 ```yaml
 pgprobackup::instance::backups:
-  FULL:
-    weekday: 5
-  DELTA:
-    weekday: [0-4,6]
+  common:
+    FULL:
+      weekday: 5
+    DELTA:
+      weekday: [0-4,6]
 ```
 
-Target backup catalog servers (one database instance can be backed to multiple locations):
+Target backup catalog servers (one database instance can be backed to multiple locations - first catalog is has `host_group` configured as `common` the other `off-site`):
+
+
 ```yaml
-pgprobackup::instance::host_groups:
-  - eu-west
+pgprobackup::instance::backups:
+  common:
+    FULL:
+      weekday: 0
+    DELTA:
+      weekday: [1-6]
+  # run full backup to `off-site` location on first of each month
+  off-site:
+    FULL:
+      monthday: 1
 ```
 
 

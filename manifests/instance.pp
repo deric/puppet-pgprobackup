@@ -20,13 +20,14 @@
 #   Hash with backups schedule
 # @example
 #   pgprobackup::instance::backups:
-#     FULL:
-#       hour: 3
-#       minute: 15
-#       weekday: 0
-#     DELTA:
-#       hour: 0
-#       minute: 45
+#     common:
+#       FULL:
+#         hour: 3
+#         minute: 15
+#         weekday: 0
+#       DELTA:
+#         hour: 0
+#         minute: 45
 #
 # @param retention_redundancy
 #   The number of full backup copies to keep in the backup catalog.
@@ -77,9 +78,11 @@ class pgprobackup::instance(
   Stdlib::AbsolutePath $log_dir              = $pgprobackup::log_dir,
   Optional[String]     $log_file             = undef,
   String               $log_level            = $pgprobackup::log_level,
-  Hash                 $backups              = {},
+  #Hash                 $backups              = {},
+  Optional[Pgprobackup::Config]  $backups   = undef,
   String               $version              = $::postgresql::globals::version,
   String               $package_name         = $pgprobackup::package_name,
+  String               $package_ensure       = $pgprobackup::package_ensure,
   Optional[Integer]    $retention_redundancy = undef,
   Optional[Integer]    $retention_window     = undef,
   Boolean              $delete_expired       = true,
@@ -88,7 +91,6 @@ class pgprobackup::instance(
   Boolean              $temp_slot            = false,
   Optional[String]     $slot                 = undef,
   Boolean              $validate             = true,
-  String               $package_ensure       = $pgprobackup::package_ensure,
   Optional[String]     $compress_algorithm   = undef,
   Integer              $compress_level       = 1,
   Optional[Integer]    $archive_timeout      = undef,
@@ -222,117 +224,26 @@ class pgprobackup::instance(
     }
 
     if $manage_cron {
-      $binary = "[ -x /usr/bin/pg_probackup-${version} ] && /usr/bin/pg_probackup-${version}"
-      $backup_cmd = "backup -B ${backup_dir}"
-
-      if $archive_wal {
-        $stream = ''
-      } else {
-        # with disabled WAL archiving, stream backup is needed
-        $stream = '--stream '
-      }
-
-      if $retention_redundancy {
-        $_retention_redundancy = " --retention-redundancy=${retention_redundancy}"
-      } else {
-        $_retention_redundancy = ''
-      }
-
-      if $retention_window {
-        $_retention_window = " --retention-window=${retention_window}"
-      } else {
-        $_retention_window = ''
-      }
-
-      if $retention_redundancy or $retention_window {
-        if $delete_expired {
-          $_dexpired = ' --delete-expired'
-        } else {
-          $_dexpired = ''
-        }
-        if $merge_expired {
-          $_mexpired = ' --merge-expired'
-        } else {
-          $_mexpired = ''
-        }
-        $expired = "${_dexpired}${_mexpired}"
-      } else {
-        $expired = ''
-      }
-
-      if $threads {
-        $_threads = " --threads=${threads}"
-      } else {
-        $_threads = ''
-      }
-
-      # replication slots
-      if $temp_slot {
-        $_temp_slot = ' --temp-slot'
-      } else {
-        $_temp_slot = ''
-      }
-
-      if $slot {
-        $_slot = " -S ${slot}"
-      } else {
-        $_slot = ''
-      }
-
-      if $validate {
-        $_validate = ''
-      } else {
-        $_validate = ' --no-validate'
-      }
-
-      $retention = "${_retention_redundancy}${_retention_window}${expired}"
-
-      if $compress_algorithm {
-        $_compress =" --compress-algorithm=${compress_algorithm} --compress-level=${compress_level}"
-      } else {
-        $_compress =''
-      }
-
-      if $archive_timeout {
-        $_timeout = " --archive-timeout=${archive_timeout}"
-      } else {
-        $_timeout = ''
-      }
-
-      $logging = "--log-filename=${_log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
-      if has_key($backups, 'FULL') {
-        $full = $backups['FULL']
-        @@cron { "pgprobackup_full_${server_address}-${host_group}":
-          command  => @("CMD"/L),
-          ${binary} ${backup_cmd} --instance ${id} -b FULL ${stream}--remote-host=${server_address}\
-           --remote-user=postgres -U ${db_user} -d ${db_name}\
-           ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}${_timeout}
-          | -CMD
-          user     => $backup_user,
-          weekday  => pick($full['weekday'], '*'),
-          hour     => pick($full['hour'], 4),
-          minute   => pick($full['minute'], 0),
-          month    => pick($full['month'], '*'),
-          monthday => pick($full['monthday'], '*'),
-          tag      => "pgprobackup-${host_group}",
-        }
-      }
-
-      if has_key($backups, 'DELTA') {
-        $delta = $backups['DELTA']
-        @@cron { "pgprobackup_delta_${server_address}-${host_group}":
-          command  => @("CMD"/L),
-          ${binary} ${backup_cmd} --instance ${id} -b DELTA ${stream}--remote-host=${server_address}\
-           --remote-user=postgres -U ${db_user} -d ${db_name}\
-           ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}${_timeout}
-          | -CMD
-          user     => $backup_user,
-          weekday  => pick($delta['weekday'], '*'),
-          hour     => pick($delta['hour'], 4),
-          minute   => pick($delta['minute'], 0),
-          month    => pick($delta['month'], '*'),
-          monthday => pick($delta['monthday'], '*'),
-          tag      => "pgprobackup-${host_group}",
+      if !empty($backups){
+        $backups.each |$group, $config| {
+          $config.each |$backup_type, $schedule| {
+            create_resources(pgprobackup::cron_backup, $schedule, {
+              host_group           => $group,
+              backup_type          => $backup_type,
+              backup_user          => $backup_user,
+              server_address       => $server_address,
+              delete_expired       => $delete_expired,
+              retention_redundancy => $retention_redundancy,
+              retention_window     => $retention_window,
+              delete_expired       => $delete_expired,
+              merge_expired        => $merge_expired,
+              threads              => $threads,
+              slot                 => $slot,
+              compress_algorithm   => $compress_algorithm,
+              compress_level       => $compress_level,
+              archive_timeout      => $archive_timeout,
+            })
+          }
         }
       }
     } # manage_cron
