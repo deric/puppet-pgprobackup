@@ -77,7 +77,7 @@ class pgprobackup::instance(
   String               $log_level            = $pgprobackup::log_level,
   #Hash                 $backups              = {},
   Optional[Pgprobackup::Config] $backups   = undef,
-  String               $version              = $::postgresql::globals::version,
+  String               $version              = $postgresql::globals::version,
   String               $package_name         = $pgprobackup::package_name,
   String               $package_ensure       = $pgprobackup::package_ensure,
   Optional[Integer]    $retention_redundancy = undef,
