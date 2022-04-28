@@ -416,7 +416,7 @@ describe 'pgprobackup::instance' do
               DELTA: {
                 hour: 3,
                 minute: 14,
-                weekday: ['0-2','4-6'],
+                weekday: ['0-2', '4-6'],
               },
               FULL: {
                 hour: 6,
@@ -448,8 +448,7 @@ describe 'pgprobackup::instance' do
           )
       }
 
-
-      it "has DELTA backup on b01" do
+      it 'has DELTA backup on b01' do
         backup = 'DELTA'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
@@ -458,18 +457,17 @@ describe 'pgprobackup::instance' do
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --archive-timeout=600'
 
-
         expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b01")
           .with(
             command: cmd,
             user: 'pgbackup',
             hour: 3,
             minute: 14,
-            weekday: ['0-2','4-6'],
+            weekday: ['0-2', '4-6'],
           )
       end
 
-      it "has FULL backup on b01" do
+      it 'has FULL backup on b01' do
         backup = 'FULL'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
@@ -477,7 +475,6 @@ describe 'pgprobackup::instance' do
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --archive-timeout=600'
-
 
         expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b01")
           .with(
@@ -489,7 +486,7 @@ describe 'pgprobackup::instance' do
           )
       end
 
-      it "has DELTA backup on b02" do
+      it 'has DELTA backup on b02' do
         backup = 'DELTA'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
@@ -497,7 +494,6 @@ describe 'pgprobackup::instance' do
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --archive-timeout=600'
-
 
         expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b02")
           .with(
@@ -509,7 +505,7 @@ describe 'pgprobackup::instance' do
           )
       end
 
-      it "has FULL backup on b02" do
+      it 'has FULL backup on b02' do
         backup = 'FULL'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
@@ -517,7 +513,6 @@ describe 'pgprobackup::instance' do
         ' -U backup -d backup --log-filename=foo.log'\
         ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
         ' --archive-timeout=600'
-
 
         expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b02")
           .with(
@@ -555,7 +550,7 @@ describe 'pgprobackup::instance' do
         }
       end
 
-      it "has DELTA backup on b01" do
+      it 'has DELTA backup on b01' do
         backup = 'DELTA'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
@@ -572,7 +567,7 @@ describe 'pgprobackup::instance' do
           )
       end
 
-      it "has FULL backup on b02" do
+      it 'has FULL backup on b02' do
         backup = 'FULL'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
@@ -588,7 +583,6 @@ describe 'pgprobackup::instance' do
             hour: 4,
           )
       end
-
     end
 
     context 'install specific package version' do
