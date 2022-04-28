@@ -12,7 +12,7 @@ describe 'pgprobackup::instance' do
       os_facts.merge(
         pgprobackup_instance_key: 'ssh-rsa AAABBBCCC',
         fqdn: 'psql.localhost',
-        manage_ssh_keys: true
+        manage_ssh_keys: true,
       )
     end
 
@@ -428,14 +428,13 @@ describe 'pgprobackup::instance' do
         }
       end
 
-
       it {
         expect(exported_resources).to contain_ssh_authorized_key('postgres-psql.localhost')
           .with(
             user: 'pgbackup',
             type: 'ssh-rsa',
             key: 'AAABBBCCC',
-            tag: ['pgprobackup-b01','pgprobackup-b02']
+            tag: ['pgprobackup-b01', 'pgprobackup-b02'],
           )
       }
 
