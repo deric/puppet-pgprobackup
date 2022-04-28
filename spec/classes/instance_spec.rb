@@ -29,7 +29,7 @@ describe 'pgprobackup::instance' do
     it {
       expect(exported_resources).to contain_ssh_authorized_key('postgres-psql.localhost')
         .with(
-          user: 'pgbackup',
+          user: 'postgres',
           type: 'ssh-rsa',
           key: 'AAABBBCCC',
           tag: ['pgprobackup-common'],
@@ -441,7 +441,7 @@ describe 'pgprobackup::instance' do
       it {
         expect(exported_resources).to contain_ssh_authorized_key('postgres-psql.localhost')
           .with(
-            user: 'pgbackup',
+            user: 'postgres',
             type: 'ssh-rsa',
             key: 'AAABBBCCC',
             tag: ['pgprobackup-b01', 'pgprobackup-b02'],

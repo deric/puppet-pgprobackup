@@ -170,9 +170,9 @@ class pgprobackup::instance(
     # Export own public SSH key
     if ($ssh_key_fact != undef and $ssh_key_fact != '') {
       $ssh_key_split = split($ssh_key_fact, ' ')
-      @@ssh_authorized_key { "postgres-${::fqdn}":
+      @@ssh_authorized_key { "${remote_user}-${::fqdn}":
         ensure => present,
-        user   => $backup_user,
+        user   => $remote_user,
         type   => $ssh_key_split[0],
         key    => $ssh_key_split[1],
         tag    => $tags,
