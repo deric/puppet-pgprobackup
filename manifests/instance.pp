@@ -4,8 +4,6 @@
 #
 # @param id
 #   Unique identifier within `host_group`
-# @param host_groups
-#   Target backup servers where will be backups stored
 # @param server_address
 #   Address used for connecting to the DB server
 # @param server_port
@@ -56,7 +54,6 @@
 #   include pgprobackup::instance
 class pgprobackup::instance(
   String               $id                   = $::hostname,
-  Array[String]        $host_groups          = [ $pgprobackup::host_group ],
   String               $server_address       = $::fqdn,
   String               $cluster              = 'main',
   Integer              $server_port          = 5432,
@@ -79,7 +76,7 @@ class pgprobackup::instance(
   Optional[String]     $log_file             = undef,
   String               $log_level            = $pgprobackup::log_level,
   #Hash                 $backups              = {},
-  Optional[Pgprobackup::Config]  $backups   = undef,
+  Optional[Pgprobackup::Config] $backups   = undef,
   String               $version              = $::postgresql::globals::version,
   String               $package_name         = $pgprobackup::package_name,
   String               $package_ensure       = $pgprobackup::package_ensure,
@@ -94,7 +91,7 @@ class pgprobackup::instance(
   Optional[String]     $compress_algorithm   = undef,
   Integer              $compress_level       = 1,
   Optional[Integer]    $archive_timeout      = undef,
-  ) inherits ::pgprobackup {
+  ) inherits pgprobackup {
 
   class {'pgprobackup::install':
     versions       => [$version],
@@ -194,66 +191,65 @@ class pgprobackup::instance(
     }
   }
 
-  $host_groups.each |String $host_group| {
+  if !empty($backups){
+    $backups.each |String $host_group, Hash $config| {
 
-    @@exec { "pgprobackup_add_instance_${::fqdn}-${host_group}":
-      command => "pg_probackup-${version} add-instance -B ${backup_dir} --instance ${id} --remote-host=${server_address} --remote-user=postgres -D ${db_dir}/${version}/${cluster}",
-      path    => ['/usr/bin'],
-      onlyif  => "test ! -d ${backup_dir}/backups/${id}",
-      tag     => "pgprobackup_add_instance-${host_group}",
-      user    => $backup_user, # note: error output might not be captured
-      require => Package["${package_name}-${version}"],
-    }
-
-    # Collect resources exported by pgprobackup::catalog
-    Postgresql::Server::Pg_hba_rule <<| tag == "pgprobackup-${host_group}" |>>
-
-    if $manage_ssh_keys {
-      # Import public key from backup server as authorized
-      Ssh_authorized_key <<| tag == "pgprobackup-${host_group}" |>> {
-        require => Class['postgresql::server'],
+      @@exec { "pgprobackup_add_instance_${::fqdn}-${host_group}":
+        command => "pg_probackup-${version} add-instance -B ${backup_dir} --instance ${id} --remote-host=${server_address} --remote-user=postgres -D ${db_dir}/${version}/${cluster}",
+        path    => ['/usr/bin'],
+        onlyif  => "test ! -d ${backup_dir}/backups/${id}",
+        tag     => "pgprobackup_add_instance-${host_group}",
+        user    => $backup_user, # note: error output might not be captured
+        require => Package["${package_name}-${version}"],
       }
-    }
 
-    if $manage_host_keys {
-      # Import backup server host key
-      Sshkey <<| tag == "pgprobackup-catalog-${host_group}" |>>
-    }
+      # Collect resources exported by pgprobackup::catalog
+      Postgresql::Server::Pg_hba_rule <<| tag == "pgprobackup-${host_group}" |>>
 
-    if $manage_cron {
-      if !empty($backups){
-        $backups.each |$group, $config| {
-          $config.each |$backup_type, $schedule| {
-
-            create_resources(pgprobackup::cron_backup, {"cron_backup-${group}-${server_address}-$backup_type" => $schedule} , {
-              id                   => $id,
-              db_name              => $db_name,
-              db_user              => $db_user,
-              version              => $version,
-              host_group           => $group,
-              backup_dir           => $backup_dir,
-              backup_type          => $backup_type,
-              backup_user          => $backup_user,
-              server_address       => $server_address,
-              delete_expired       => $delete_expired,
-              retention_redundancy => $retention_redundancy,
-              retention_window     => $retention_window,
-              merge_expired        => $merge_expired,
-              threads              => $threads,
-              temp_slot            => $temp_slot,
-              slot                 => $slot,
-              validate             => $validate,
-              compress_algorithm   => $compress_algorithm,
-              compress_level       => $compress_level,
-              archive_timeout      => $archive_timeout,
-              archive_wal          => $archive_wal,
-              log_dir              => $log_dir,
-              log_file             => $log_file,
-              log_level            => $log_level,
-            })
-          }
+      if $manage_ssh_keys {
+        # Import public key from backup server as authorized
+        Ssh_authorized_key <<| tag == "pgprobackup-${host_group}" |>> {
+          require => Class['postgresql::server'],
         }
       }
-    } # manage_cron
-  } # host_group
+
+      if $manage_host_keys {
+        # Import backup server host key
+        Sshkey <<| tag == "pgprobackup-catalog-${host_group}" |>>
+      }
+
+      if $manage_cron {
+
+          $config.each |$backup_type, $schedule| {
+
+          create_resources(pgprobackup::cron_backup, {"cron_backup-${host_group}-${server_address}-${backup_type}" => $schedule} , {
+            id                   => $id,
+            db_name              => $db_name,
+            db_user              => $db_user,
+            version              => $version,
+            host_group           => $host_group,
+            backup_dir           => $backup_dir,
+            backup_type          => $backup_type,
+            backup_user          => $backup_user,
+            server_address       => $server_address,
+            delete_expired       => $delete_expired,
+            retention_redundancy => $retention_redundancy,
+            retention_window     => $retention_window,
+            merge_expired        => $merge_expired,
+            threads              => $threads,
+            temp_slot            => $temp_slot,
+            slot                 => $slot,
+            validate             => $validate,
+            compress_algorithm   => $compress_algorithm,
+            compress_level       => $compress_level,
+            archive_timeout      => $archive_timeout,
+            archive_wal          => $archive_wal,
+            log_dir              => $log_dir,
+            log_file             => $log_file,
+            log_level            => $log_level,
+          })
+        }
+      } # manage_cron
+    } # host_group
+  }
 }
