@@ -408,7 +408,6 @@ describe 'pgprobackup::instance' do
     end
 
     context 'backup instance to multiple servers' do
-      backup_catalogs = [ 'b01', 'b02' ]
       let(:params) do
         {
           backups: {
