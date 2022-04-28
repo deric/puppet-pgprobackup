@@ -106,6 +106,11 @@ pgprobackup::instance::backups:
     FULL:
       hour: 5
       monthday: 1
+      retention_redundancy: 2
+      retention_window: 7
+      delete_expired: true
+      merge_expired: true
+      threads: 3
 ```
 
 

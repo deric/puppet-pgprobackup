@@ -528,6 +528,66 @@ describe 'pgprobackup::instance' do
             monthday: 1,
           )
       end
+    end
+
+    context 'configured params per backup server' do
+      let(:params) do
+        {
+          backups: {
+            b01: {
+              DELTA: {
+                hour: 5,
+                threads: 4,
+                compress_algorithm: 'zlib',
+                compress_level: 3,
+              },
+            },
+            b02: {
+              FULL: {
+                retention_redundancy: 2,
+                retention_window: 7,
+                delete_expired: true,
+              },
+            }
+          },
+          version: '13',
+          archive_timeout: 600,
+        }
+      end
+
+      it "has DELTA backup on b01" do
+        backup = 'DELTA'
+        cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
+        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' -U backup -d backup --log-filename=foo.log'\
+        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+        ' --threads=4 --compress-algorithm=zlib --compress-level=3 --archive-timeout=600'
+
+        expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b01")
+          .with(
+            command: cmd,
+            user: 'pgbackup',
+            hour: 5,
+          )
+      end
+
+      it "has FULL backup on b02" do
+        backup = 'FULL'
+        cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
+        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        ' --remote-host=psql.localhost --remote-user=postgres'\
+        ' -U backup -d backup --log-filename=foo.log'\
+        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+        ' --retention-redundancy=2 --retention-window=7 --delete-expired --archive-timeout=600'
+
+        expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b02")
+          .with(
+            command: cmd,
+            user: 'pgbackup',
+            hour: 4,
+          )
+      end
 
     end
 
