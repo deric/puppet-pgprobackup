@@ -34,10 +34,20 @@ Module touches many resources, including PostgreSQL configuration that might req
 
 ## Usage
 
-Backup server (where backup data will be stored) requires packages for all different PostgreSQL version that are running the same `host_group`, e.g. `pg_probackup-11`, `pg_probackup-12`.
+Backup server(s) (where backup data will be stored) requires packages for all different PostgreSQL version that are running the same `host_group`, e.g. `pg_probackup-11`, `pg_probackup-12`.
 ```puppet
 include pgprobackup::catalog
 ```
+
+each backup server should define:
+```yaml
+pgprobackup::catalog::host_group: common
+# pg_probackup has dedicated binaries for each major PostgreSQL versions
+pgprobackup::catalog::versions:
+  - '13'
+  - '14'
+```
+
 NOTE: Package version `catalog` and `instance` needs to be exactly the same! (e.g. `2.3.3-1.6a736c2db6402d77`).
 
 `pgprobackup::package_ensure` allows pinpointing to a specific version:
@@ -55,28 +65,54 @@ Configure `pgprobackup` to run full backup every Sunday (via CRON job):
 ```yaml
 pgprobackup::manage_cron: true
 pgprobackup::instance::backups:
-  FULL:
-    hour: 3
-    minute: 15
-    weekday: [0] # same as `7` or `Sunday`
+  common:
+    FULL:
+      hour: 3
+      minute: 15
+      weekday: [0] # same as `7` or `Sunday`
 ```
 Incremental (`DELTA`) backups every day except Sunday:
 ```yaml
 pgprobackup::instance::backups:
-  FULL:
-    weekday: 0
-  DELTA:
-    weekday: [1-6]
+  common:
+    FULL:
+      weekday: 0
+    DELTA:
+      weekday: [1-6]
 ```
 
 Incremental (`DELTA`) backups every day except Friday, full backup on Friday:
 ```yaml
 pgprobackup::instance::backups:
-  FULL:
-    weekday: 5
-  DELTA:
-    weekday: [0-4,6]
+  common:
+    FULL:
+      weekday: 5
+    DELTA:
+      weekday: [0-4,6]
 ```
+
+Target backup catalog servers (one database instance can be backed to multiple locations - first catalog is has `host_group` configured as `common` the other `off-site`):
+
+
+```yaml
+pgprobackup::instance::backups:
+  common:
+    FULL:
+      weekday: 0
+    DELTA:
+      weekday: [1-6]
+  # run full backup to `off-site` location on first of each month
+  off-site:
+    FULL:
+      hour: 5
+      monthday: 1
+      retention_redundancy: 2
+      retention_window: 7
+      delete_expired: true
+      merge_expired: true
+      threads: 3
+```
+
 
 There are many shared parameters between `instance` and `catalog`. Such parameters are defined in `pgprobackup::` namespace, such as `pgprobackup::package_name` (base package name to be installed on both instance and catalog).
 

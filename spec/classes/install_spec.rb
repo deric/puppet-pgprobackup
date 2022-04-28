@@ -21,25 +21,17 @@ describe 'pgprobackup::install' do
       when 'Debian'
         it { is_expected.to compile }
         it {
-          is_expected.to contain_package('pg-probackup-12').with(
-            ensure: 'present',
-          )
+          is_expected.to contain_package('pg-probackup-12').with_ensure(%r{present|installed})
         }
         it {
-          is_expected.to contain_package('pg-probackup-12-dbg').with(
-            ensure: 'present',
-          )
+          is_expected.to contain_package('pg-probackup-12-dbg').with_ensure(%r{present|installed})
         }
       when 'RedHat'
         it {
-          is_expected.to contain_package('pg_probackup-12').with(
-            ensure: 'present',
-          )
+          is_expected.to contain_package('pg_probackup-12').with_ensure(%r{present|installed})
         }
         it {
-          is_expected.to contain_package('pg_probackup-12-debuginfo').with(
-            ensure: 'present',
-          )
+          is_expected.to contain_package('pg_probackup-12-debuginfo').with_ensure(%r{present|installed})
         }
       end
 
@@ -56,25 +48,17 @@ describe 'pgprobackup::install' do
         case os_facts[:os]['family']
         when 'Debian'
           it {
-            is_expected.to contain_package('pg-probackup-12').with(
-              ensure: 'present',
-            )
+            is_expected.to contain_package('pg-probackup-12').with_ensure(%r{present|installed})
           }
           it {
-            is_expected.not_to contain_package('pg-probackup-12-dbg').with(
-              ensure: 'present',
-            )
+            is_expected.not_to contain_package('pg-probackup-12-dbg').with_ensure(%r{present|installed})
           }
         when 'RedHat'
           it {
-            is_expected.to contain_package('pg_probackup-12').with(
-              ensure: 'present',
-            )
+            is_expected.to contain_package('pg_probackup-12').with_ensure(%r{present|installed})
           }
           it {
-            is_expected.not_to contain_package('pg_probackup-12-debuginfo').with(
-              ensure: 'present',
-            )
+            is_expected.not_to contain_package('pg_probackup-12-debuginfo').with_ensure(%r{present|installed})
           }
         else
           it { is_expected.to compile.and_raise_error(%r{Unsupported managed repository for osfamily}) }
@@ -93,25 +77,17 @@ describe 'pgprobackup::install' do
         case os_facts[:os]['family']
         when 'Debian'
           it {
-            is_expected.to contain_package('pg-probackup-11').with(
-              ensure: 'present',
-            )
+            is_expected.to contain_package('pg-probackup-11').with_ensure(%r{present|installed})
           }
           it {
-            is_expected.to contain_package('pg-probackup-11-dbg').with(
-              ensure: 'present',
-            )
+            is_expected.to contain_package('pg-probackup-11-dbg').with_ensure(%r{present|installed})
           }
         when 'RedHat'
           it {
-            is_expected.to contain_package('pg_probackup-11').with(
-              ensure: 'present',
-            )
+            is_expected.to contain_package('pg_probackup-11').with_ensure(%r{present|installed})
           }
           it {
-            is_expected.to contain_package('pg_probackup-11-debuginfo').with(
-              ensure: 'present',
-            )
+            is_expected.to contain_package('pg_probackup-11-debuginfo').with_ensure(%r{present|installed})
           }
         else
           it { is_expected.to compile.and_raise_error(%r{Unsupported managed repository for osfamily}) }
@@ -131,25 +107,17 @@ describe 'pgprobackup::install' do
         case os_facts[:os]['family']
         when 'Debian'
           it {
-            is_expected.to contain_package('pg-probackup-11').with(
-              ensure: 'present',
-            )
+            is_expected.to contain_package('pg-probackup-11').with_ensure(%r{present|installed})
           }
           it {
-            is_expected.to contain_package('pg-probackup-12').with(
-              ensure: 'present',
-            )
+            is_expected.to contain_package('pg-probackup-12').with_ensure(%r{present|installed})
           }
         when 'RedHat'
           it {
-            is_expected.to contain_package('pg_probackup-11').with(
-              ensure: 'present',
-            )
+            is_expected.to contain_package('pg_probackup-11').with_ensure(%r{present|installed})
           }
           it {
-            is_expected.to contain_package('pg_probackup-12').with(
-              ensure: 'present',
-            )
+            is_expected.to contain_package('pg_probackup-12').with_ensure(%r{present|installed})
           }
         else
           it { is_expected.to compile.and_raise_error(%r{Unsupported managed repository for osfamily}) }
