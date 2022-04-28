@@ -142,16 +142,13 @@ class pgprobackup::instance(
 
   }
 
-  if $log_file {
-    $_log_file = $log_file
-  } else {
-    # use file per db instance
-    $_log_file = "${id}.log"
-  }
-
   # tag all target catalogs
-  $tags = $host_groups.map|$group| {
-    "pgprobackup-${group}"
+  if(!empty($backups)) {
+    $tags = $backups.map|$group, $config| {
+      "pgprobackup-${group}"
+    }
+  } else {
+    $tags = [ "pgprobackup-${$pgprobackup::host_group}" ]
   }
 
   if $manage_host_keys {
@@ -227,21 +224,32 @@ class pgprobackup::instance(
       if !empty($backups){
         $backups.each |$group, $config| {
           $config.each |$backup_type, $schedule| {
-            create_resources(pgprobackup::cron_backup, $schedule, {
+
+            create_resources(pgprobackup::cron_backup, {"cron_backup-${group}-${server_address}-$backup_type" => $schedule} , {
+              id                   => $id,
+              db_name              => $db_name,
+              db_user              => $db_user,
+              version              => $version,
               host_group           => $group,
+              backup_dir           => $backup_dir,
               backup_type          => $backup_type,
               backup_user          => $backup_user,
               server_address       => $server_address,
               delete_expired       => $delete_expired,
               retention_redundancy => $retention_redundancy,
               retention_window     => $retention_window,
-              delete_expired       => $delete_expired,
               merge_expired        => $merge_expired,
               threads              => $threads,
+              temp_slot            => $temp_slot,
               slot                 => $slot,
+              validate             => $validate,
               compress_algorithm   => $compress_algorithm,
               compress_level       => $compress_level,
               archive_timeout      => $archive_timeout,
+              archive_wal          => $archive_wal,
+              log_dir              => $log_dir,
+              log_file             => $log_file,
+              log_level            => $log_level,
             })
           }
         }

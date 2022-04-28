@@ -2,23 +2,30 @@
 # A cron job is exported from a database instance, but could be executed elsewhere.
 # Typically on a catalog (backup) server.
 define pgprobackup::cron_backup(
+  String                   $id,
   String                   $host_group,
   Pgprobackup::Backup_type $backup_type,
   String                   $server_address,
   String                   $db_name,
   String                   $db_user,
+  String                   $version,
   String                   $backup_user,
-  Optional[Integer]        $retention_redundancy = undef,
-  Optional[Integer]        $retention_window     = undef,
-  Boolean                  $delete_expired       = true,
-  Boolean                  $merge_expired        = false,
-  Optional[Integer]        $threads              = undef,
-  Boolean                  $temp_slot            = false,
-  Optional[String]         $slot                 = undef,
-  Boolean                  $validate             = true,
-  Optional[String]         $compress_algorithm   = undef,
-  Integer                  $compress_level       = 1,
-  Optional[Integer]        $archive_timeout      = undef,
+  Stdlib::AbsolutePath     $backup_dir,
+  Stdlib::AbsolutePath     $log_dir,
+  String                   $log_level,
+  Optional[String]         $log_file,
+  Optional[Integer]        $retention_redundancy,
+  Optional[Integer]        $retention_window,
+  Boolean                  $delete_expired,
+  Boolean                  $merge_expired,
+  Optional[Integer]        $threads,
+  Boolean                  $temp_slot,
+  Optional[String]         $slot,
+  Boolean                  $validate,
+  Optional[String]         $compress_algorithm,
+  Integer                  $compress_level,
+  Optional[Integer]        $archive_timeout,
+  Boolean                  $archive_wal,
   Optional[Cron::Hour]     $hour                 = 4,
   Optional[Cron::Minute]   $minute               = 0,
   Optional[Cron::Month]    $month                = '*',
@@ -103,11 +110,18 @@ define pgprobackup::cron_backup(
       $_timeout = ''
     }
 
+    if $log_file {
+      $_log_file = $log_file
+    } else {
+      # use file per db instance
+      $_log_file = "${id}.log"
+    }
+
     $logging = "--log-filename=${_log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
 
-    @@cron { "pgprobackup_delta_${server_address}-${host_group}":
+    @@cron { "pgprobackup_${backup_type}_${server_address}-${host_group}":
       command  => @("CMD"/L),
-      ${binary} ${backup_cmd} --instance ${id} -b $backup_type ${stream}--remote-host=${server_address}\
+      ${binary} ${backup_cmd} --instance ${id} -b ${backup_type} ${stream}--remote-host=${server_address}\
        --remote-user=postgres -U ${db_user} -d ${db_name}\
        ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}${_timeout}
       | -CMD

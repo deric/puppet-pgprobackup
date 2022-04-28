@@ -104,6 +104,7 @@ pgprobackup::instance::backups:
   # run full backup to `off-site` location on first of each month
   off-site:
     FULL:
+      hour: 5
       monthday: 1
 ```
 
