@@ -77,6 +77,54 @@ describe 'pgprobackup::instance' do
       }
     end
 
+    context 'with plain text password' do
+      let(:params) do
+        {
+          backups: {
+            common: {
+              FULL: {},
+            },
+          },
+          version: '13',
+          id: 'psql',
+          server_port: 5433,
+          db_name: 'pg_backup',
+          db_user:  'pg_probackup',
+          db_password: 'TopSecret!',
+        }
+      end
+
+      it {
+        expect(exported_resources).to contain_file_line('pgprobackup_pgpass_content-psql').with(
+          line: 'psql.localhost:5433:pg_backup:pg_probackup:TopSecret!',
+        )
+      }
+    end
+
+    context 'with encrypted password' do
+      let(:params) do
+        {
+          backups: {
+            common: {
+              FULL: {},
+            },
+          },
+          version: '13',
+          id: 'psql',
+          server_port: 5433,
+          db_name: 'pg_backup',
+          db_user:  'pg_probackup',
+          db_password: sensitive('TopSecret!'),
+        }
+      end
+
+      it {
+        expect(exported_resources).to contain_file_line('pgprobackup_pgpass_content-psql').with(
+          line: 'psql.localhost:5433:pg_backup:pg_probackup:TopSecret!',
+        )
+      }
+    end
+
     context 'with customized CRON schedule' do
       let(:params) do
         {
