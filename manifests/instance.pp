@@ -4,10 +4,18 @@
 #
 # @param id
 #   Unique identifier within `host_group`
+# @param cluster
+#   Could be used to group primary with standby servers
 # @param server_address
 #   Address used for connecting to the DB server
 # @param server_port
 #   DB port
+# @param db_name
+#   Database used for backups
+# @param db_user
+#   User connecting to database
+# @param db_cluster
+#   Postgresql cluster e.g. `main`
 # @param db_dir
 #   PostgreSQL home directory
 # @param manage_dbuser
@@ -58,13 +66,14 @@
 #   include pgprobackup::instance
 class pgprobackup::instance(
   String                            $id                   = $::hostname,
+  String                            $cluster              = $::hostname,
   String                            $server_address       = $::fqdn,
-  String                            $cluster              = 'main',
   Integer                           $server_port          = 5432,
   Boolean                           $manage_dbuser        = true,
   String                            $db_dir               = '/var/lib/postgresql',
   String                            $db_name              = $pgprobackup::db_name,
   String                            $db_user              = $pgprobackup::db_user,
+  String                            $db_cluster           = 'main',
   Variant[String,Sensitive[String]] $db_password          = '',
   Optional[String]                  $seed                 = undef,
   String                            $remote_user          = 'postgres',
@@ -206,7 +215,7 @@ class pgprobackup::instance(
         command => @("CMD"/L),
         pg_probackup-${version} add-instance -B ${backup_dir} --instance ${id} \
         --remote-host=${server_address} --remote-user=${remote_user} \
-        --remote-port=${remote_port} -D ${db_dir}/${version}/${cluster}
+        --remote-port=${remote_port} -D ${db_dir}/${version}/${db_cluster}
         | -CMD
         path    => ['/usr/bin'],
         onlyif  => "test ! -d ${backup_dir}/backups/${id}",

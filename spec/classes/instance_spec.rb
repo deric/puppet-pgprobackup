@@ -56,13 +56,14 @@ describe 'pgprobackup::instance' do
             }
           },
           version: '12',
+          db_cluster: 'dev',
         }
       end
 
       it {
         expect(exported_resources).to contain_exec('pgprobackup_add_instance_psql.localhost-common').with(
           tag: 'pgprobackup_add_instance-common',
-          command: 'pg_probackup-12 add-instance -B /var/lib/pgbackup --instance foo --remote-host=psql.localhost --remote-user=postgres --remote-port=22 -D /var/lib/postgresql/12/main',
+          command: 'pg_probackup-12 add-instance -B /var/lib/pgbackup --instance foo --remote-host=psql.localhost --remote-user=postgres --remote-port=22 -D /var/lib/postgresql/12/dev',
         )
       }
 
