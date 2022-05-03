@@ -133,7 +133,7 @@ class pgprobackup::catalog (
 
   if $manage_host_keys {
     # Import db instances host keys
-    Sshkey <<| tag == "pgprobackup-${host_group}-instance" |>>
+    Sshkey <<| tag == "pgprobackup-${host_group}" |>>
 
     # Export catalog's host key
     @@sshkey { "pgprobackup-catalog-${::fqdn}":

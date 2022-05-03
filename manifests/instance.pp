@@ -167,7 +167,7 @@ class pgprobackup::instance(
       "pgprobackup-${group}"
     }
   } else {
-    $tags = [ "pgprobackup-${$pgprobackup::host_group}" ]
+    $tags = [ "pgprobackup-${pgprobackup::host_group}" ]
   }
 
   if $manage_host_keys {

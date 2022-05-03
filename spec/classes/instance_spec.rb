@@ -13,6 +13,7 @@ describe 'pgprobackup::instance' do
         pgprobackup_instance_key: 'ssh-rsa AAABBBCCC',
         fqdn: 'psql.localhost',
         manage_ssh_keys: true,
+        sshecdsakey: 'AAAAE2VjZHNhLXNoYTBtbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBHSTDlBLg+FouBL5gEmO1PYmVNbguoZ5ECdIG/Acwt9SylhSAqZSlKKFojY3XwcTvokz/zfeVPesnNnBVgFWmXU=',
       )
     end
 
@@ -98,6 +99,26 @@ describe 'pgprobackup::instance' do
       it {
         expect(exported_resources).to contain_file_line('pgprobackup_pgpass_content-psql').with(
           line: 'psql.localhost:5433:pg_backup:pg_probackup:TopSecret!',
+        )
+      }
+    end
+
+    context 'exporting host ssh key' do
+      let(:params) do
+        {
+          version: '13',
+          id: 'psql',
+          manage_host_keys: true,
+          backup_dir: '/backup',
+        }
+      end
+
+      it {
+        expect(exported_resources).to contain_sshkey('postgres-psql.localhost').with(
+          ensure: 'present',
+          target: '/backup/.ssh/known_hosts',
+          key: 'AAAAE2VjZHNhLXNoYTBtbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBHSTDlBLg+FouBL5gEmO1PYmVNbguoZ5ECdIG/Acwt9SylhSAqZSlKKFojY3XwcTvokz/zfeVPesnNnBVgFWmXU=',
+          tag: ['pgprobackup-common'],
         )
       }
     end
