@@ -3,6 +3,7 @@
 # Typically on a catalog (backup) server.
 define pgprobackup::cron_backup(
   String                          $id,
+  String                          $cluster,
   String                          $host_group,
   Pgprobackup::Backup_type        $backup_type,
   String                          $server_address,
@@ -123,7 +124,7 @@ define pgprobackup::cron_backup(
 
     @@cron { "pgprobackup_${backup_type}_${server_address}-${host_group}":
       command  => @("CMD"/L),
-      ${binary} ${backup_cmd} --instance ${id} -b ${backup_type} ${stream}--remote-host=${server_address}\
+      ${binary} ${backup_cmd} --instance ${cluster} -b ${backup_type} ${stream}--remote-host=${server_address}\
        --remote-user=${remote_user} --remote-port=${remote_port} -U ${db_user} -d ${db_name}\
        ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}${_timeout}
       | -CMD

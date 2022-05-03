@@ -634,6 +634,41 @@ describe 'pgprobackup::instance' do
       end
     end
 
+    context 'with cluster grouping' do
+      let(:params) do
+        {
+          backups: {
+            common: {
+              DELTA: {},
+              FULL: {},
+            }
+          },
+          version: '13',
+          id: 'psql01a',
+          cluster: 'psql01',
+        }
+      end
+
+      ['DELTA', 'FULL'].each do |backup|
+        cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
+        " -B /var/lib/pgbackup --instance psql01 -b #{backup} --stream"\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
+        ' -U backup -d backup --log-filename=psql01a.log'\
+        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'
+
+        it {
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-common")
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
+    end
+
+
     context 'install specific package version' do
       let(:params) do
         {
