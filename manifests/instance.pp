@@ -4,10 +4,18 @@
 #
 # @param id
 #   Unique identifier within `host_group`
+# @param cluster
+#   Could be used to group primary with standby servers
 # @param server_address
 #   Address used for connecting to the DB server
 # @param server_port
 #   DB port
+# @param db_name
+#   Database used for backups
+# @param db_user
+#   User connecting to database
+# @param db_cluster
+#   Postgresql cluster e.g. `main`
 # @param db_dir
 #   PostgreSQL home directory
 # @param manage_dbuser
@@ -58,13 +66,14 @@
 #   include pgprobackup::instance
 class pgprobackup::instance(
   String                            $id                   = $::hostname,
+  Optional[String]                  $cluster              = undef,
   String                            $server_address       = $::fqdn,
-  String                            $cluster              = 'main',
   Integer                           $server_port          = 5432,
   Boolean                           $manage_dbuser        = true,
   String                            $db_dir               = '/var/lib/postgresql',
   String                            $db_name              = $pgprobackup::db_name,
   String                            $db_user              = $pgprobackup::db_user,
+  String                            $db_cluster           = 'main',
   Variant[String,Sensitive[String]] $db_password          = '',
   Optional[String]                  $seed                 = undef,
   String                            $remote_user          = 'postgres',
@@ -97,6 +106,11 @@ class pgprobackup::instance(
   Integer                           $compress_level       = 1,
   Optional[Integer]                 $archive_timeout      = undef,
   ) inherits pgprobackup {
+
+  $_cluster = $cluster ? {
+    undef   => $id,
+    default => $cluster
+  }
 
   class {'pgprobackup::install':
     versions       => [$version],
@@ -204,12 +218,12 @@ class pgprobackup::instance(
 
       @@exec { "pgprobackup_add_instance_${::fqdn}-${host_group}":
         command => @("CMD"/L),
-        pg_probackup-${version} add-instance -B ${backup_dir} --instance ${id} \
+        pg_probackup-${version} add-instance -B ${backup_dir} --instance ${_cluster} \
         --remote-host=${server_address} --remote-user=${remote_user} \
-        --remote-port=${remote_port} -D ${db_dir}/${version}/${cluster}
+        --remote-port=${remote_port} -D ${db_dir}/${version}/${db_cluster}
         | -CMD
         path    => ['/usr/bin'],
-        onlyif  => "test ! -d ${backup_dir}/backups/${id}",
+        onlyif  => "test ! -d ${backup_dir}/backups/${_cluster}",
         tag     => "pgprobackup_add_instance-${host_group}",
         user    => $backup_user, # note: error output might not be captured
         require => Package["${package_name}-${version}"],
@@ -236,6 +250,7 @@ class pgprobackup::instance(
           # declare cron job, use defaults from instance
           create_resources(pgprobackup::cron_backup, {"cron_backup-${host_group}-${server_address}-${backup_type}" => $schedule} , {
             id                   => $id,
+            cluster              => $_cluster,
             db_name              => $db_name,
             db_user              => $db_user,
             version              => $version,

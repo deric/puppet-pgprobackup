@@ -56,13 +56,14 @@ describe 'pgprobackup::instance' do
             }
           },
           version: '12',
+          db_cluster: 'dev',
         }
       end
 
       it {
         expect(exported_resources).to contain_exec('pgprobackup_add_instance_psql.localhost-common').with(
           tag: 'pgprobackup_add_instance-common',
-          command: 'pg_probackup-12 add-instance -B /var/lib/pgbackup --instance foo --remote-host=psql.localhost --remote-user=postgres --remote-port=22 -D /var/lib/postgresql/12/main',
+          command: 'pg_probackup-12 add-instance -B /var/lib/pgbackup --instance foo --remote-host=psql.localhost --remote-user=postgres --remote-port=22 -D /var/lib/postgresql/12/dev',
         )
       }
 
@@ -630,6 +631,40 @@ describe 'pgprobackup::instance' do
             user: 'pgbackup',
             hour: 4,
           )
+      end
+    end
+
+    context 'with cluster grouping' do
+      let(:params) do
+        {
+          backups: {
+            common: {
+              DELTA: {},
+              FULL: {},
+            }
+          },
+          version: '13',
+          id: 'psql01a',
+          cluster: 'psql01',
+        }
+      end
+
+      ['DELTA', 'FULL'].each do |backup|
+        cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
+        " -B /var/lib/pgbackup --instance psql01 -b #{backup} --stream"\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
+        ' -U backup -d backup --log-filename=psql01a.log'\
+        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'
+
+        it {
+          expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-common")
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
       end
     end
 
