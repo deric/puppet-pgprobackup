@@ -236,7 +236,6 @@ describe 'pgprobackup::instance' do
       }
     end
 
-
     context 'with custom backup script' do
       let(:params) do
         {
