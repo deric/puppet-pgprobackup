@@ -133,7 +133,7 @@ class pgprobackup::catalog (
 
   if $manage_host_keys {
     # Import db instances host keys
-    Sshkey <<| tag == "pgprobackup-${host_group}-instance" |>>
+    Sshkey <<| tag == "pgprobackup-${host_group}" |>>
 
     # Export catalog's host key
     @@sshkey { "pgprobackup-catalog-${::fqdn}":
@@ -182,7 +182,7 @@ class pgprobackup::catalog (
       user   => 'postgres',
       type   => $ssh_key_splitted[0],
       key    => $ssh_key_splitted[1],
-      tag    => "pgprobackup-${host_group}",
+      tag    => "pgprobackup-catalog-${host_group}",
     }
   }
 

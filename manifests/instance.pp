@@ -167,7 +167,7 @@ class pgprobackup::instance(
       "pgprobackup-${group}"
     }
   } else {
-    $tags = [ "pgprobackup-${$pgprobackup::host_group}" ]
+    $tags = [ "pgprobackup-${pgprobackup::host_group}" ]
   }
 
   if $manage_host_keys {
@@ -223,6 +223,7 @@ class pgprobackup::instance(
         --remote-port=${remote_port} -D ${db_dir}/${version}/${db_cluster}
         | -CMD
         path    => ['/usr/bin'],
+        cwd     => $backup_dir,
         onlyif  => "test ! -d ${backup_dir}/backups/${_cluster}",
         tag     => "pgprobackup_add_instance-${host_group}",
         user    => $backup_user, # note: error output might not be captured
@@ -234,7 +235,7 @@ class pgprobackup::instance(
 
       if $manage_ssh_keys {
         # Import public key from backup server as authorized
-        Ssh_authorized_key <<| tag == "pgprobackup-${host_group}" |>> {
+        Ssh_authorized_key <<| tag == "pgprobackup-catalog-${host_group}" |>> {
           require => Class['postgresql::server'],
         }
       }
