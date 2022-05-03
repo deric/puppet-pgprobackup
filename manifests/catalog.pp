@@ -182,7 +182,7 @@ class pgprobackup::catalog (
       user   => 'postgres',
       type   => $ssh_key_splitted[0],
       key    => $ssh_key_splitted[1],
-      tag    => "pgprobackup-${host_group}",
+      tag    => "pgprobackup-catalog-${host_group}",
     }
   }
 

@@ -234,7 +234,7 @@ class pgprobackup::instance(
 
       if $manage_ssh_keys {
         # Import public key from backup server as authorized
-        Ssh_authorized_key <<| tag == "pgprobackup-${host_group}" |>> {
+        Ssh_authorized_key <<| tag == "pgprobackup-catalog-${host_group}" |>> {
           require => Class['postgresql::server'],
         }
       }
