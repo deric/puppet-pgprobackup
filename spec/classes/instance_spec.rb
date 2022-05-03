@@ -236,6 +236,37 @@ describe 'pgprobackup::instance' do
       }
     end
 
+
+    context 'with custom backup script' do
+      let(:params) do
+        {
+          backups: {
+            common: {
+              DELTA: {},
+            }
+          },
+          binary: '/usr/local/backup',
+          version: '14',
+        }
+      end
+
+      cmd = '/usr/local/backup backup'\
+      ' -B /var/lib/pgbackup --instance foo -b DELTA --stream'\
+      ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
+      ' -U backup -d backup --log-filename=foo.log'\
+      ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'
+
+      it {
+        expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
+          .with(
+            command: cmd,
+            user: 'pgbackup',
+            hour: '4',
+            minute: '0',
+          )
+      }
+    end
+
     context 'with retention disabled merge and delete' do
       let(:params) do
         {
