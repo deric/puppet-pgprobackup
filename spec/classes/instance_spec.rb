@@ -668,7 +668,6 @@ describe 'pgprobackup::instance' do
       end
     end
 
-
     context 'install specific package version' do
       let(:params) do
         {
