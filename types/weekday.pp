@@ -1,5 +1,5 @@
 type Pgprobackup::Weekday = Variant[
-                          Integer[1,7],
+                          Integer[0,7],
                           String,
-                          Tuple[Variant[String, Integer[1,7]], 1, default]
+                          Tuple[Variant[String, Integer[0,7]], 1, default]
                         ]
