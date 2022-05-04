@@ -61,6 +61,8 @@
 #   user used for ssh connection to the DB instance
 # @param remote_port
 #   ssh port used for connection to the DB instance from catalog server
+# @param binary
+#   custom script to be executed as backup command
 #
 # @example
 #   include pgprobackup::instance
@@ -105,6 +107,7 @@ class pgprobackup::instance(
   Optional[String]                  $compress_algorithm   = undef,
   Integer                           $compress_level       = 1,
   Optional[Integer]                 $archive_timeout      = undef,
+  Optional[String]                  $binary               = undef,
   ) inherits pgprobackup {
 
   $_cluster = $cluster ? {
@@ -277,6 +280,7 @@ class pgprobackup::instance(
             log_level            => $log_level,
             remote_user          => $remote_user,
             remote_port          => $remote_port,
+            binary               => $binary,
           })
         }
       } # manage_cron
