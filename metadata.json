@@ -1,6 +1,6 @@
 {
   "name": "deric-pgprobackup",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "author": "deric",
   "summary": "Manage PostgreSQL database backups using pg_probackup tool",
   "license": "Apache-2.0",
