@@ -29,14 +29,18 @@ define pgprobackup::cron_backup(
   Integer                         $compress_level,
   Optional[Integer]               $archive_timeout,
   Boolean                         $archive_wal,
-  Optional[Pgprobackup::Hour]     $hour                 = 4,
-  Optional[Pgprobackup::Minute]   $minute               = 0,
-  Optional[Pgprobackup::Month]    $month                = '*',
-  Optional[Pgprobackup::Weekday]  $weekday              = '*',
-  Optional[Pgprobackup::Monthday] $monthday             = undef,
+  Optional[Pgprobackup::Hour]     $hour = 4,
+  Optional[Pgprobackup::Minute]   $minute = 0,
+  Optional[Pgprobackup::Month]    $month = '*',
+  Optional[Pgprobackup::Weekday]  $weekday = '*',
+  Optional[Pgprobackup::Monthday] $monthday = undef,
+  Optional[String]                $binary,
   ){
-
-    $binary = "[ -x /usr/bin/pg_probackup-${version} ] && /usr/bin/pg_probackup-${version}"
+    if $binary {
+      $_binary = $binary
+    } else {
+      $_binary = "[ -x /usr/bin/pg_probackup-${version} ] && /usr/bin/pg_probackup-${version}"
+    }
     $backup_cmd = "backup -B ${backup_dir}"
 
     if $archive_wal {
@@ -124,7 +128,7 @@ define pgprobackup::cron_backup(
 
     @@cron { "pgprobackup_${backup_type}_${server_address}-${host_group}":
       command  => @("CMD"/L),
-      ${binary} ${backup_cmd} --instance ${cluster} -b ${backup_type} ${stream}--remote-host=${server_address}\
+      ${_binary} ${backup_cmd} --instance ${cluster} -b ${backup_type} ${stream}--remote-host=${server_address}\
        --remote-user=${remote_user} --remote-port=${remote_port} -U ${db_user} -d ${db_name}\
        ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}${_timeout}
       | -CMD
