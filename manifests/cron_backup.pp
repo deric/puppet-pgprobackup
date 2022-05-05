@@ -38,6 +38,8 @@ define pgprobackup::cron_backup(
   Optional[String]                $binary,
   Boolean                         $redirect_console,
   Optional[String]                $log_console = undef,
+  Optional[String]                $log_rotation_size    = undef,
+  Optional[String]                $log_rotation_age     = undef,
   ){
 
     @@cron { "pgprobackup_${backup_type}_${server_address}-${host_group}":
@@ -73,6 +75,8 @@ define pgprobackup::cron_backup(
             binary               => $binary,
             redirect_console     => $redirect_console,
             log_console          => $log_console,
+            log_rotation_size    => $log_rotation_size,
+            log_rotation_age     => $log_rotation_age,
           }),
       user     => $backup_user,
       weekday  => $weekday,

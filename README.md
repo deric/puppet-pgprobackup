@@ -154,6 +154,8 @@ pgprobackup::instance::backups:
  * `log_console` - custom filename for console log (requires `redirect_console: true`)
  * `log_level_file` - allowed values `off, error, warning, info, log, verbose`
  * `log_level_console` - allowed values `off, error, warning, info, log, verbose`
+ * `log_rotation_size` - rotate logfile if its size exceeds this value; 0 disables; (default: 0) available units: 'kB', 'MB', 'GB', 'TB' (default: kB)
+ * `log_rotation_age` - rotate logfile if its size exceeds this value; 0 disables; (default: 0) available units: 'ms', 's', 'min', 'h', 'd' (default: min)
 
 ## Limitations
 

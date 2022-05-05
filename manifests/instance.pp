@@ -67,6 +67,12 @@
 #   Redirect console output to a log file (make sense especially with custom backup command)
 # @param log_console
 #   File for storing console logs
+# @param log_rotation_size
+#   rotate logfile if its size exceeds this value; 0 disables; (default: 0)
+#   available units: 'kB', 'MB', 'GB', 'TB' (default: kB)
+# @param log_rotation_age
+#   rotate logfile if its age exceeds this value; 0 disables; (default: 0)
+#   available units: 'ms', 's', 'min', 'h', 'd' (default: min)
 #
 # @example
 #   include pgprobackup::instance
@@ -115,6 +121,8 @@ class pgprobackup::instance(
   Optional[String]                  $binary               = undef,
   Boolean                           $redirect_console     = false,
   Optional[String]                  $log_console          = undef,
+  Optional[String]                  $log_rotation_size    = undef,
+  Optional[String]                  $log_rotation_age     = undef,
   ) inherits pgprobackup {
 
   $_cluster = $cluster ? {
@@ -290,6 +298,8 @@ class pgprobackup::instance(
             remote_port          => $remote_port,
             binary               => $binary,
             redirect_console     => $redirect_console,
+            log_rotation_size    => $log_rotation_size,
+            log_rotation_age     => $log_rotation_age,
           })
         }
       } # manage_cron

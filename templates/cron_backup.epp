@@ -30,6 +30,8 @@
   Optional[String]                $binary = undef,
   Optional[String]                $log_console = undef,
   Boolean                         $redirect_console,
+  Optional[String]                $log_rotation_size = undef,
+  Optional[String]                $log_rotation_age = undef,
 | -%>
 <%# Compose backup command -%>
 <% if $binary { -%>
@@ -95,3 +97,9 @@
 <%= " >> ${log_dir}/${cluster}.log 2>&1" -%>
 <%   }-%>
 <% }-%>
+<% if $log_rotation_size { -%>
+<%= " --log-rotation-size=${log_rotation_size}" -%>
+<% } -%>
+<% if $log_rotation_age { -%>
+<%= " --log-rotation-age=${log_rotation_age}" -%>
+<% } -%>

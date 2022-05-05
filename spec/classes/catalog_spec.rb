@@ -103,6 +103,5 @@ describe 'pgprobackup::catalog' do
                 group: 'pgbackup')
       }
     end
-
   end
 end

@@ -739,12 +739,12 @@ describe 'pgprobackup::instance' do
         end
 
         cmd = '/usr/local/backup backup'\
-        " -B /var/lib/pgbackup --instance psql01 -b DELTA --stream"\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-directory=/var/log/pgbackup'
 
         it {
-          expect(exported_resources).to contain_cron("pgprobackup_DELTA_psql.localhost-common")
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
             .with(
               command: cmd,
               user: 'pgbackup',
@@ -771,12 +771,12 @@ describe 'pgprobackup::instance' do
         end
 
         cmd = '/usr/local/backup backup'\
-        " -B /var/lib/pgbackup --instance psql01 -b DELTA --stream"\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-level-file=error'
 
         it {
-          expect(exported_resources).to contain_cron("pgprobackup_DELTA_psql.localhost-common")
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
             .with(
               command: cmd,
               user: 'pgbackup',
@@ -804,12 +804,12 @@ describe 'pgprobackup::instance' do
         end
 
         cmd = '/usr/local/backup backup'\
-        " -B /var/lib/pgbackup --instance psql01 -b DELTA --stream"\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-level-console=verbose'
 
         it {
-          expect(exported_resources).to contain_cron("pgprobackup_DELTA_psql.localhost-common")
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
             .with(
               command: cmd,
               user: 'pgbackup',
@@ -837,12 +837,12 @@ describe 'pgprobackup::instance' do
         end
 
         cmd = '/usr/local/backup backup'\
-        " -B /var/lib/pgbackup --instance psql01 -b DELTA --stream"\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-level-console=verbose'
 
         it {
-          expect(exported_resources).to contain_cron("pgprobackup_DELTA_psql.localhost-common")
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
             .with(
               command: cmd,
               user: 'pgbackup',
@@ -872,12 +872,12 @@ describe 'pgprobackup::instance' do
         end
 
         cmd = '/usr/local/backup backup'\
-        " -B /var/lib/pgbackup --instance psql01 -b DELTA --stream"\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-level-console=log --log-directory=/var/log/pgbackup >> /var/log/pgbackup/psql01.log 2>&1'
 
         it {
-          expect(exported_resources).to contain_cron("pgprobackup_DELTA_psql.localhost-common")
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
             .with(
               command: cmd,
               user: 'pgbackup',
@@ -909,13 +909,13 @@ describe 'pgprobackup::instance' do
         end
 
         cmd = '/usr/local/backup backup'\
-        " -B /var/lib/pgbackup --instance psql01 -b DELTA --stream"\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --log-level-file=off --log-level-console=warning'\
         ' --log-directory=/var/log/pgbackup >> /var/log/pgbackup/pgbackup.log 2>&1'
 
         it {
-          expect(exported_resources).to contain_cron("pgprobackup_DELTA_psql.localhost-common")
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
             .with(
               command: cmd,
               user: 'pgbackup',
@@ -925,6 +925,73 @@ describe 'pgprobackup::instance' do
         }
       end
 
+      context 'with log rotation size' do
+        let(:params) do
+          {
+            backups: {
+              common: {
+                DELTA: {
+                  log_level_file: 'info',
+                  log_rotation_size: '100MB',
+                },
+              }
+            },
+            version: '13',
+            id: 'psql01a',
+            cluster: 'psql01',
+            binary: '/usr/local/backup',
+          }
+        end
+
+        cmd = '/usr/local/backup backup'\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
+        ' -U backup -d backup --log-level-file=info --log-rotation-size=100MB'
+
+        it {
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
+
+      context 'with log rotation age' do
+        let(:params) do
+          {
+            backups: {
+              common: {
+                DELTA: {
+                  log_level_file: 'info',
+                  log_rotation_age: '1d',
+                },
+              }
+            },
+            version: '13',
+            id: 'psql01a',
+            cluster: 'psql01',
+            binary: '/usr/local/backup',
+          }
+        end
+
+        cmd = '/usr/local/backup backup'\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
+        ' -U backup -d backup --log-level-file=info --log-rotation-age=1d'
+
+        it {
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
     end
   end
 end
