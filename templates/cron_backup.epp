@@ -28,6 +28,8 @@
   Optional[Integer]               $archive_timeout = undef,
   Boolean                         $archive_wal,
   Optional[String]                $binary = undef,
+  Optional[String]                $log_console = undef,
+  Boolean                         $redirect_console,
 | -%>
 <%# Compose backup command -%>
 <% if $binary { -%>
@@ -75,7 +77,21 @@
 <%= " --archive-timeout=${archive_timeout}" -%>
 <% } -%>
 <% if $log_file { -%>
-<%= "--log-filename=${log_file} --log-level-file=${log_level_file} --log-directory=${log_dir}" -%>
-<% } else { -%>
+<%= " --log-filename=${log_file}" -%>
+<% } -%>
+<% if $log_level_file { -%>
+<%= " --log-level-file=${log_level_file}" -%>
+<% } -%>
+<% if $log_level_console { -%>
+<%= " --log-level-console=${log_level_console}" -%>
+<% } -%>
+<% if $log_dir { -%>
+<%= " --log-directory=${log_dir}" -%>
+<% } -%>
+<% if $redirect_console { -%>
+<%   if $log_console { -%>
+<%= " >> ${log_dir}/${log_console} 2>&1" -%>
+<%   } else { -%>
 <%= " >> ${log_dir}/${cluster}.log 2>&1" -%>
+<%   }-%>
 <% }-%>

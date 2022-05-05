@@ -63,6 +63,10 @@
 #   ssh port used for connection to the DB instance from catalog server
 # @param binary
 #   custom script to be executed as backup command
+# @param redirect_console
+#   Redirect console output to a log file (make sense especially with custom backup command)
+# @param log_console
+#   File for storing console logs
 #
 # @example
 #   include pgprobackup::instance
@@ -89,7 +93,7 @@ class pgprobackup::instance(
   Stdlib::AbsolutePath              $backup_dir           = $pgprobackup::backup_dir,
   String                            $backup_user          = $pgprobackup::backup_user,
   String                            $ssh_key_fact         = $::pgprobackup_instance_key,
-  Stdlib::AbsolutePath              $log_dir              = $pgprobackup::log_dir,
+  Optional[Stdlib::AbsolutePath]    $log_dir              = $pgprobackup::log_dir,
   Optional[String]                  $log_file             = undef,
   Optional[Pgprobackup::LogLevel]   $log_level_file       = undef,
   Optional[Pgprobackup::LogLevel]   $log_level_console    = undef,
@@ -109,6 +113,8 @@ class pgprobackup::instance(
   Integer                           $compress_level       = 1,
   Optional[Integer]                 $archive_timeout      = undef,
   Optional[String]                  $binary               = undef,
+  Boolean                           $redirect_console     = false,
+  Optional[String]                  $log_console          = undef,
   ) inherits pgprobackup {
 
   $_cluster = $cluster ? {
@@ -283,6 +289,7 @@ class pgprobackup::instance(
             remote_user          => $remote_user,
             remote_port          => $remote_port,
             binary               => $binary,
+            redirect_console     => $redirect_console,
           })
         }
       } # manage_cron

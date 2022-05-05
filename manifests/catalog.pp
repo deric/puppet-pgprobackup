@@ -20,28 +20,28 @@
 # @example
 #   include pgprobackup::catalog
 class pgprobackup::catalog (
-  Stdlib::AbsolutePath      $backup_dir = $pgprobackup::backup_dir,
-  Stdlib::AbsolutePath      $log_dir = $pgprobackup::log_dir,
-  String                    $logrotate_template = 'pgprobackup/logrotate.conf.erb',
-  String                    $exported_ipaddress = "${::ipaddress}/32",
-  String                    $user = $pgprobackup::backup_user,
-  String                    $group = $pgprobackup::backup_user,
-  String                    $dir_mode = '0750',
-  Enum['present', 'absent'] $user_ensure = 'present',
-  String                    $user_shell = '/bin/bash',
-  Boolean                   $manage_ssh_keys = $pgprobackup::manage_ssh_keys,
-  Boolean                   $manage_host_keys = $pgprobackup::manage_host_keys,
-  Boolean                   $manage_pgpass = $pgprobackup::manage_pgpass,
-  Boolean                   $manage_hba = $pgprobackup::manage_hba,
-  Boolean                   $manage_cron = $pgprobackup::manage_cron,
-  Boolean                   $purge_cron = true,
-  Optional[Integer]         $uid = undef,
-  String                    $host_group = $pgprobackup::host_group,
-  Integer                   $hba_entry_order = 50,
-  String                    $ssh_key_fact = $::pgprobackup_catalog_key,
-  String                    $package_name = $pgprobackup::package_name,
-  Array[String]             $versions = ['12'],
-  String                    $package_ensure = $pgprobackup::package_ensure,
+  Stdlib::AbsolutePath           $backup_dir = $pgprobackup::backup_dir,
+  Optional[Stdlib::AbsolutePath] $log_dir = $pgprobackup::log_dir,
+  String                         $logrotate_template = 'pgprobackup/logrotate.conf.erb',
+  String                         $exported_ipaddress = "${::ipaddress}/32",
+  String                         $user = $pgprobackup::backup_user,
+  String                         $group = $pgprobackup::backup_user,
+  String                         $dir_mode = '0750',
+  Enum['present', 'absent']      $user_ensure = 'present',
+  String                         $user_shell = '/bin/bash',
+  Boolean                        $manage_ssh_keys = $pgprobackup::manage_ssh_keys,
+  Boolean                        $manage_host_keys = $pgprobackup::manage_host_keys,
+  Boolean                        $manage_pgpass = $pgprobackup::manage_pgpass,
+  Boolean                        $manage_hba = $pgprobackup::manage_hba,
+  Boolean                        $manage_cron = $pgprobackup::manage_cron,
+  Boolean                        $purge_cron = true,
+  Optional[Integer]              $uid = undef,
+  String                         $host_group = $pgprobackup::host_group,
+  Integer                        $hba_entry_order = 50,
+  String                         $ssh_key_fact = $::pgprobackup_catalog_key,
+  String                         $package_name = $pgprobackup::package_name,
+  Array[String]                  $versions = ['12'],
+  String                         $package_ensure = $pgprobackup::package_ensure,
 ) inherits ::pgprobackup {
 
   class {'pgprobackup::install':
@@ -87,10 +87,12 @@ class pgprobackup::catalog (
     require => File[$backup_dir],
   }
 
-  file { $log_dir:
-    ensure => directory,
-    owner  => $user,
-    group  => $group,
+  if $log_dir {
+    file { $log_dir:
+      ensure => directory,
+      owner  => $user,
+      group  => $group,
+    }
   }
 
   if $manage_ssh_keys {

@@ -28,22 +28,22 @@
 # @example
 #   include pgprobackup
 class pgprobackup(
-  String                $package_name,
-  String                $package_ensure   = 'present',
-  String                $host_group       = 'common',
-  String                $db_name          = 'backup',
-  String                $db_user          = 'backup',
-  Boolean               $debug_symbols    = true,
-  Optional[String]      $debug_suffix,
-  Stdlib::AbsolutePath  $backup_dir       = '/var/lib/pgbackup',
-  String                $backup_user      = 'pgbackup',
-  Stdlib::AbsolutePath  $log_dir          = '/var/lib/pgbackup/log',
-  Boolean               $manage_ssh_keys  = true,
-  Boolean               $manage_host_keys = true,
-  Boolean               $manage_pgpass    = true,
-  Boolean               $manage_hba       = true,
-  Boolean               $manage_cron      = true,
-  String                $host_key_type    = 'ecdsa-sha2-nistp256',
+  String                         $package_name,
+  String                         $package_ensure   = 'present',
+  String                         $host_group       = 'common',
+  String                         $db_name          = 'backup',
+  String                         $db_user          = 'backup',
+  Boolean                        $debug_symbols    = true,
+  Optional[String]               $debug_suffix,
+  Stdlib::AbsolutePath           $backup_dir       = '/var/lib/pgbackup',
+  String                         $backup_user      = 'pgbackup',
+  Optional[Stdlib::AbsolutePath] $log_dir          = undef,
+  Boolean                        $manage_ssh_keys  = true,
+  Boolean                        $manage_host_keys = true,
+  Boolean                        $manage_pgpass    = true,
+  Boolean                        $manage_hba       = true,
+  Boolean                        $manage_cron      = true,
+  String                         $host_key_type    = 'ecdsa-sha2-nistp256',
 ) {
 
   contain pgprobackup::repo
