@@ -1,0 +1,81 @@
+<%- |
+  String                          $id,
+  String                          $cluster,
+  String                          $host_group,
+  Pgprobackup::Backup_type        $backup_type,
+  String                          $server_address,
+  String                          $db_name,
+  String                          $db_user,
+  String                          $version,
+  String                          $backup_user,
+  String                          $remote_user,
+  Integer                         $remote_port,
+  Stdlib::AbsolutePath            $backup_dir,
+  Optional[Stdlib::AbsolutePath]  $log_dir = undef,
+  Optional[Pgprobackup::LogLevel] $log_level_file = undef,
+  Optional[Pgprobackup::LogLevel] $log_level_console = undef,
+  Optional[String]                $log_file = undef,
+  Optional[Integer]               $retention_redundancy = undef,
+  Optional[Integer]               $retention_window = undef,
+  Boolean                         $delete_expired,
+  Boolean                         $merge_expired,
+  Optional[Integer]               $threads = undef,
+  Boolean                         $temp_slot,
+  Optional[String]                $slot = undef,
+  Boolean                         $validate,
+  Optional[String]                $compress_algorithm = undef,
+  Optional[Integer]               $compress_level = undef,
+  Optional[Integer]               $archive_timeout = undef,
+  Boolean                         $archive_wal,
+  Optional[String]                $binary = undef,
+| -%>
+<%# Compose backup command -%>
+<% if $binary { -%>
+<%= $binary -%>
+<% } else { -%>
+<%= "[ -x /usr/bin/pg_probackup-${version} ] && /usr/bin/pg_probackup-${version}" -%>
+<% }  -%>
+<%= " backup -B ${backup_dir} --instance ${cluster} -b ${backup_type}" -%>
+<% if !$archive_wal { -%>
+<%# with disabled WAL archiving, stream backup is needed -%>
+<%= ' --stream' -%>
+<% } -%>
+<%= " --remote-host=${server_address} --remote-user=${remote_user} --remote-port=${remote_port}" -%>
+<%= " -U ${db_user} -d ${db_name}" -%>
+<% if $retention_redundancy { -%>
+<%= " --retention-redundancy=${retention_redundancy}" -%>
+<% } -%>
+<% if $retention_window { -%>
+<%= " --retention-window=${retention_window}" -%>
+<% } -%>
+<% if $retention_redundancy or $retention_window { -%>
+<%   if $delete_expired { -%>
+<%= ' --delete-expired' -%>
+<%   } -%>
+<%   if $merge_expired { -%>
+<%= ' --merge-expired' -%>
+<%   } -%>
+<% } -%>
+<% if $threads { -%>
+<%= " --threads=${threads}" -%>
+<% } -%>
+<% if $temp_slot { -%>
+<%= ' --temp-slot' -%>
+<% } -%>
+<% if $slot { -%>
+<%= " -S ${slot}" -%>
+<% } -%>
+<% if !$validate { -%>
+<%= ' --no-validate' -%>
+<% } -%>
+<% if $compress_algorithm { -%>
+<%= " --compress-algorithm=${compress_algorithm} --compress-level=${compress_level}" -%>
+<% } -%>
+<% if $archive_timeout { -%>
+<%= " --archive-timeout=${archive_timeout}" -%>
+<% } -%>
+<% if $log_file { -%>
+<%= "--log-filename=${log_file} --log-level-file=${log_level_file} --log-directory=${log_dir}" -%>
+<% } else { -%>
+<%= " >> ${log_dir}/${cluster}.log 2>&1" -%>
+<% }-%>
