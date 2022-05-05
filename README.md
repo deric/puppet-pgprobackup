@@ -19,10 +19,10 @@ Module touches many resources, including PostgreSQL configuration that might req
 
  - database configuration
  - database roles
- - role password
- - SSH host keys
- - SSH authorized keys (public SSH keys)
- - CRON jobs
+ - `pgprobackup::manage_pgpass` role password (default: `true`)
+ - `pgprobackup::manage_host_keys` SSH host keys (default: `true`)
+ - `pgprobackup::manage_ssh_keys` SSH authorized keys (public SSH keys)
+ - `pgprobackup::manage_cron` CRON jobs (default: `true`)
  - user accounts
  - `pgprobackup` catalog
 
@@ -165,7 +165,7 @@ Could not find resource 'Package[pg-probackup-11]' in parameter 'require'
 ```
 
 means, that the server requires packages for all different Postgresql versions that are being backed up.
-```
+```yaml
 pgprobackup::catalog::versions:
   - '11'
   - '12'
