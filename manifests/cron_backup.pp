@@ -14,8 +14,9 @@ define pgprobackup::cron_backup(
   String                          $remote_user,
   Integer                         $remote_port,
   Stdlib::AbsolutePath            $backup_dir,
-  Stdlib::AbsolutePath            $log_dir,
-  String                          $log_level,
+  Optional[Stdlib::AbsolutePath]  $log_dir,
+  Optional[Pgprobackup::LogLevel] $log_level_file,
+  Optional[Pgprobackup::LogLevel] $log_level_console,
   Optional[String]                $log_file,
   Optional[Integer]               $retention_redundancy,
   Optional[Integer]               $retention_window,
@@ -35,103 +36,48 @@ define pgprobackup::cron_backup(
   Optional[Pgprobackup::Weekday]  $weekday = '*',
   Optional[Pgprobackup::Monthday] $monthday = undef,
   Optional[String]                $binary,
+  Boolean                         $redirect_console,
+  Optional[String]                $log_console = undef,
+  Optional[String]                $log_rotation_size    = undef,
+  Optional[String]                $log_rotation_age     = undef,
   ){
-    if $binary {
-      $_binary = $binary
-    } else {
-      $_binary = "[ -x /usr/bin/pg_probackup-${version} ] && /usr/bin/pg_probackup-${version}"
-    }
-    $backup_cmd = "backup -B ${backup_dir}"
-
-    if $archive_wal {
-      $stream = ''
-    } else {
-      # with disabled WAL archiving, stream backup is needed
-      $stream = '--stream '
-    }
-
-    if $retention_redundancy {
-      $_retention_redundancy = " --retention-redundancy=${retention_redundancy}"
-    } else {
-      $_retention_redundancy = ''
-    }
-
-    if $retention_window {
-      $_retention_window = " --retention-window=${retention_window}"
-    } else {
-      $_retention_window = ''
-    }
-
-    if $retention_redundancy or $retention_window {
-      if $delete_expired {
-        $_dexpired = ' --delete-expired'
-      } else {
-        $_dexpired = ''
-      }
-      if $merge_expired {
-        $_mexpired = ' --merge-expired'
-      } else {
-        $_mexpired = ''
-      }
-      $expired = "${_dexpired}${_mexpired}"
-    } else {
-      $expired = ''
-    }
-
-    if $threads {
-      $_threads = " --threads=${threads}"
-    } else {
-      $_threads = ''
-    }
-
-    # replication slots
-    if $temp_slot {
-      $_temp_slot = ' --temp-slot'
-    } else {
-      $_temp_slot = ''
-    }
-
-    if $slot {
-      $_slot = " -S ${slot}"
-    } else {
-      $_slot = ''
-    }
-
-    if $validate {
-      $_validate = ''
-    } else {
-      $_validate = ' --no-validate'
-    }
-
-    $retention = "${_retention_redundancy}${_retention_window}${expired}"
-
-    if $compress_algorithm {
-      $_compress =" --compress-algorithm=${compress_algorithm} --compress-level=${compress_level}"
-    } else {
-      $_compress =''
-    }
-
-    if $archive_timeout {
-      $_timeout = " --archive-timeout=${archive_timeout}"
-    } else {
-      $_timeout = ''
-    }
-
-    if $log_file {
-      $_log_file = $log_file
-    } else {
-      # use file per db instance
-      $_log_file = "${id}.log"
-    }
-
-    $logging = "--log-filename=${_log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
 
     @@cron { "pgprobackup_${backup_type}_${server_address}-${host_group}":
-      command  => @("CMD"/L),
-      ${_binary} ${backup_cmd} --instance ${cluster} -b ${backup_type} ${stream}--remote-host=${server_address}\
-       --remote-user=${remote_user} --remote-port=${remote_port} -U ${db_user} -d ${db_name}\
-       ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}${_timeout}
-      | -CMD
+      command  => epp('pgprobackup/cron_backup.epp', {
+            id                   => $id,
+            cluster              => $cluster,
+            db_name              => $db_name,
+            db_user              => $db_user,
+            version              => $version,
+            host_group           => $host_group,
+            backup_dir           => $backup_dir,
+            backup_type          => $backup_type,
+            backup_user          => $backup_user,
+            server_address       => $server_address,
+            delete_expired       => $delete_expired,
+            retention_redundancy => $retention_redundancy,
+            retention_window     => $retention_window,
+            merge_expired        => $merge_expired,
+            threads              => $threads,
+            temp_slot            => $temp_slot,
+            slot                 => $slot,
+            validate             => $validate,
+            compress_algorithm   => $compress_algorithm,
+            compress_level       => $compress_level,
+            archive_timeout      => $archive_timeout,
+            archive_wal          => $archive_wal,
+            log_dir              => $log_dir,
+            log_file             => $log_file,
+            log_level_file       => $log_level_file,
+            log_level_console    => $log_level_console,
+            remote_user          => $remote_user,
+            remote_port          => $remote_port,
+            binary               => $binary,
+            redirect_console     => $redirect_console,
+            log_console          => $log_console,
+            log_rotation_size    => $log_rotation_size,
+            log_rotation_age     => $log_rotation_age,
+          }),
       user     => $backup_user,
       weekday  => $weekday,
       hour     => $hour,

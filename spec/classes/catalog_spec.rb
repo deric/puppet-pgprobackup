@@ -51,13 +51,6 @@ describe 'pgprobackup::catalog' do
               mode: '0750')
     }
 
-    it {
-      is_expected.to contain_file('/var/lib/pgbackup/log')
-        .with(ensure: 'directory',
-              owner: 'pgbackup',
-              group: 'pgbackup')
-    }
-
     case os_facts[:os]['family']
     when 'Debian'
       it {
@@ -94,6 +87,21 @@ describe 'pgprobackup::catalog' do
       else
         it { is_expected.to compile.and_raise_error(%r{Unsupported managed repository for osfamily}) }
       end
+    end
+
+    context 'with log directory' do
+      let(:params) do
+        {
+          log_dir: '/var/log/pgbackup',
+        }
+      end
+
+      it {
+        is_expected.to contain_file('/var/log/pgbackup')
+          .with(ensure: 'directory',
+                owner: 'pgbackup',
+                group: 'pgbackup')
+      }
     end
   end
 end

@@ -131,6 +131,31 @@ There are many shared parameters between `instance` and `catalog`. Such paramete
   * `compress_level` `0-9` (defalt: `1`)
   * `archive_timeout` Timeout in seconds for copying all remaining WAL files (default `300`).
 
+### Logging
+
+Parameters can be specified on `instance` level:
+
+```yaml
+pgprobackup::instance::log_dir: /var/log/pg_probackup
+pgprobackup::instance::log_level_file: info
+```
+
+or for specific backup:
+```yaml
+pgprobackup::instance::backups:
+  common:
+    FULL:
+      log_level_file: verbose
+```
+
+ * `log_dir` - by default stored to `backup dir/log`
+ * `log_file` - custom filename
+ * `redirect_console` redirect stdout & stderr to file (default: `false`)
+ * `log_console` - custom filename for console log (requires `redirect_console: true`)
+ * `log_level_file` - allowed values `off, error, warning, info, log, verbose`
+ * `log_level_console` - allowed values `off, error, warning, info, log, verbose`
+ * `log_rotation_size` - rotate logfile if its size exceeds this value; 0 disables; (default: 0) available units: 'kB', 'MB', 'GB', 'TB' (default: kB)
+ * `log_rotation_age` - rotate logfile if its size exceeds this value; 0 disables; (default: 0) available units: 'ms', 's', 'min', 'h', 'd' (default: min)
 
 ## Limitations
 

@@ -190,8 +190,7 @@ describe 'pgprobackup::instance' do
       cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
       ' -B /var/lib/pgbackup --instance foo -b DELTA --stream'\
       ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-      ' -U backup -d backup --log-filename=foo.log'\
-      ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'
+      ' -U backup -d backup'
 
       it {
         expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
@@ -221,9 +220,8 @@ describe 'pgprobackup::instance' do
       cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
       ' -B /var/lib/pgbackup --instance foo -b DELTA --stream'\
       ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-      ' -U backup -d backup --log-filename=foo.log'\
-      ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-      ' --retention-redundancy=2 --retention-window=7 --delete-expired'
+      ' -U backup -d backup --retention-redundancy=2 --retention-window=7'\
+      ' --delete-expired'
 
       it {
         expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
@@ -252,8 +250,7 @@ describe 'pgprobackup::instance' do
       cmd = '/usr/local/backup backup'\
       ' -B /var/lib/pgbackup --instance foo -b DELTA --stream'\
       ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-      ' -U backup -d backup --log-filename=foo.log'\
-      ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'
+      ' -U backup -d backup'
 
       it {
         expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
@@ -287,8 +284,7 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=foo.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
+        ' -U backup -d backup'\
         ' --retention-redundancy=2 --retention-window=7 --merge-expired'
 
         it {
@@ -321,9 +317,7 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=foo.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-        ' --threads=4'
+        ' -U backup -d backup --threads=4'
 
         it {
           expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-common")
@@ -355,9 +349,7 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=foo.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-        ' --temp-slot'
+        ' -U backup -d backup --temp-slot'
 
         it {
           expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-common")
@@ -389,9 +381,7 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=foo.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-        ' -S pg_probackup'
+        ' -U backup -d backup -S pg_probackup'
 
         it {
           expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-common")
@@ -423,9 +413,7 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=foo.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-        ' --no-validate'
+        ' -U backup -d backup --no-validate'
 
         it {
           expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-common")
@@ -458,9 +446,7 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=foo.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-        ' --compress-algorithm=zlib --compress-level=2'
+        ' -U backup -d backup --compress-algorithm=zlib --compress-level=2'
 
         it {
           expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-common")
@@ -492,9 +478,7 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=foo.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-        ' --archive-timeout=600'
+        ' -U backup -d backup --archive-timeout=600'
 
         it {
           expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-common")
@@ -553,9 +537,7 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=foo.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-        ' --archive-timeout=600'
+        ' -U backup -d backup --archive-timeout=600'
 
         expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b01")
           .with(
@@ -572,9 +554,7 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=foo.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-        ' --archive-timeout=600'
+        ' -U backup -d backup --archive-timeout=600'
 
         expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b01")
           .with(
@@ -591,9 +571,7 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=foo.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-        ' --archive-timeout=600'
+        ' -U backup -d backup --archive-timeout=600'
 
         expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b02")
           .with(
@@ -610,9 +588,7 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=foo.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-        ' --archive-timeout=600'
+        ' -U backup -d backup --archive-timeout=600'
 
         expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b02")
           .with(
@@ -655,9 +631,8 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=foo.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-        ' --threads=4 --compress-algorithm=zlib --compress-level=3 --archive-timeout=600'
+        ' -U backup -d backup --threads=4 --compress-algorithm=zlib --compress-level=3'\
+        ' --archive-timeout=600'
 
         expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b01")
           .with(
@@ -672,9 +647,8 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=foo.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'\
-        ' --retention-redundancy=2 --retention-window=7 --delete-expired --archive-timeout=600'
+        ' -U backup -d backup --retention-redundancy=2 --retention-window=7'\
+        ' --delete-expired --archive-timeout=600'
 
         expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-b02")
           .with(
@@ -704,8 +678,7 @@ describe 'pgprobackup::instance' do
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
         " -B /var/lib/pgbackup --instance psql01 -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
-        ' -U backup -d backup --log-filename=psql01a.log'\
-        ' --log-level-file=info --log-directory=/var/lib/pgbackup/log'
+        ' -U backup -d backup'
 
         it {
           expect(exported_resources).to contain_cron("pgprobackup_#{backup}_psql.localhost-common")
@@ -744,6 +717,280 @@ describe 'pgprobackup::instance' do
         }
       else
         it { is_expected.to compile.and_raise_error(%r{Unsupported managed repository for osfamily}) }
+      end
+    end
+
+    describe 'logging' do
+      context 'with log_dir' do
+        let(:params) do
+          {
+            backups: {
+              common: {
+                DELTA: {
+                  log_dir: '/var/log/pgbackup',
+                },
+              }
+            },
+            version: '13',
+            id: 'psql01a',
+            cluster: 'psql01',
+            binary: '/usr/local/backup',
+          }
+        end
+
+        cmd = '/usr/local/backup backup'\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
+        ' -U backup -d backup --log-directory=/var/log/pgbackup'
+
+        it {
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
+
+      context 'with log_file_level' do
+        let(:params) do
+          {
+            backups: {
+              common: {
+                DELTA: {},
+              }
+            },
+            log_level_file: 'error',
+            version: '13',
+            id: 'psql01a',
+            cluster: 'psql01',
+            binary: '/usr/local/backup',
+          }
+        end
+
+        cmd = '/usr/local/backup backup'\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
+        ' -U backup -d backup --log-level-file=error'
+
+        it {
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
+
+      context 'with log_console_level' do
+        let(:params) do
+          {
+            backups: {
+              common: {
+                DELTA: {
+                  log_level_console: 'verbose',
+                },
+              }
+            },
+            version: '13',
+            id: 'psql01a',
+            cluster: 'psql01',
+            binary: '/usr/local/backup',
+          }
+        end
+
+        cmd = '/usr/local/backup backup'\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
+        ' -U backup -d backup --log-level-console=verbose'
+
+        it {
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
+
+      context 'with console level' do
+        let(:params) do
+          {
+            backups: {
+              common: {
+                DELTA: {
+                  log_level_console: 'verbose',
+                },
+              }
+            },
+            version: '13',
+            id: 'psql01a',
+            cluster: 'psql01',
+            binary: '/usr/local/backup',
+          }
+        end
+
+        cmd = '/usr/local/backup backup'\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
+        ' -U backup -d backup --log-level-console=verbose'
+
+        it {
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
+
+      context 'with console level and redirect' do
+        let(:params) do
+          {
+            backups: {
+              common: {
+                DELTA: {
+                  redirect_console: true,
+                },
+              }
+            },
+            log_dir: '/var/log/pgbackup',
+            log_level_console: 'log',
+            version: '13',
+            id: 'psql01a',
+            cluster: 'psql01',
+            binary: '/usr/local/backup',
+          }
+        end
+
+        cmd = '/usr/local/backup backup'\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
+        ' -U backup -d backup --log-level-console=log --log-directory=/var/log/pgbackup >> /var/log/pgbackup/psql01.log 2>&1'
+
+        it {
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
+
+      context 'with redirect and log file' do
+        let(:params) do
+          {
+            backups: {
+              common: {
+                DELTA: {
+                  redirect_console: true,
+                  log_console: 'pgbackup.log',
+                  log_dir: '/var/log/pgbackup',
+                  log_level_console: 'warning',
+                  log_level_file: 'off',
+                },
+              }
+            },
+            version: '13',
+            id: 'psql01a',
+            cluster: 'psql01',
+            binary: '/usr/local/backup',
+          }
+        end
+
+        cmd = '/usr/local/backup backup'\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
+        ' -U backup -d backup --log-level-file=off --log-level-console=warning'\
+        ' --log-directory=/var/log/pgbackup >> /var/log/pgbackup/pgbackup.log 2>&1'
+
+        it {
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
+
+      context 'with log rotation size' do
+        let(:params) do
+          {
+            backups: {
+              common: {
+                DELTA: {
+                  log_level_file: 'info',
+                  log_rotation_size: '100MB',
+                },
+              }
+            },
+            version: '13',
+            id: 'psql01a',
+            cluster: 'psql01',
+            binary: '/usr/local/backup',
+          }
+        end
+
+        cmd = '/usr/local/backup backup'\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
+        ' -U backup -d backup --log-level-file=info --log-rotation-size=100MB'
+
+        it {
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
+      end
+
+      context 'with log rotation age' do
+        let(:params) do
+          {
+            backups: {
+              common: {
+                DELTA: {
+                  log_level_file: 'info',
+                  log_rotation_age: '1d',
+                },
+              }
+            },
+            version: '13',
+            id: 'psql01a',
+            cluster: 'psql01',
+            binary: '/usr/local/backup',
+          }
+        end
+
+        cmd = '/usr/local/backup backup'\
+        ' -B /var/lib/pgbackup --instance psql01 -b DELTA --stream'\
+        ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
+        ' -U backup -d backup --log-level-file=info --log-rotation-age=1d'
+
+        it {
+          expect(exported_resources).to contain_cron('pgprobackup_DELTA_psql.localhost-common')
+            .with(
+              command: cmd,
+              user: 'pgbackup',
+              hour: '4',
+              minute: '0',
+            )
+        }
       end
     end
   end

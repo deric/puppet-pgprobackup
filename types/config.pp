@@ -17,6 +17,14 @@ type Pgprobackup::Config = Hash[String, Hash[
                                                   Optional[compress_algorithm] => String,
                                                   Optional[compress_level] => Integer,
                                                   Optional[archive_wal] => Boolean,
+                                                  Optional[log_dir] => Stdlib::AbsolutePath,
+                                                  Optional[log_file] => String,
+                                                  Optional[log_console] => String,
+                                                  Optional[log_rotation_size] => String,
+                                                  Optional[log_rotation_age] => String,
+                                                  Optional[redirect_console] => Boolean,
+                                                  Optional[log_level_file] => Pgprobackup::LogLevel,
+                                                  Optional[log_level_console] => Pgprobackup::LogLevel,
                                                 }]
                                               ]
                                             ]

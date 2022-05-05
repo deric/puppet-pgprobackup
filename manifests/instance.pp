@@ -63,6 +63,16 @@
 #   ssh port used for connection to the DB instance from catalog server
 # @param binary
 #   custom script to be executed as backup command
+# @param redirect_console
+#   Redirect console output to a log file (make sense especially with custom backup command)
+# @param log_console
+#   File for storing console logs
+# @param log_rotation_size
+#   rotate logfile if its size exceeds this value; 0 disables; (default: 0)
+#   available units: 'kB', 'MB', 'GB', 'TB' (default: kB)
+# @param log_rotation_age
+#   rotate logfile if its age exceeds this value; 0 disables; (default: 0)
+#   available units: 'ms', 's', 'min', 'h', 'd' (default: min)
 #
 # @example
 #   include pgprobackup::instance
@@ -89,9 +99,10 @@ class pgprobackup::instance(
   Stdlib::AbsolutePath              $backup_dir           = $pgprobackup::backup_dir,
   String                            $backup_user          = $pgprobackup::backup_user,
   String                            $ssh_key_fact         = $::pgprobackup_instance_key,
-  Stdlib::AbsolutePath              $log_dir              = $pgprobackup::log_dir,
+  Optional[Stdlib::AbsolutePath]    $log_dir              = $pgprobackup::log_dir,
   Optional[String]                  $log_file             = undef,
-  String                            $log_level            = $pgprobackup::log_level,
+  Optional[Pgprobackup::LogLevel]   $log_level_file       = undef,
+  Optional[Pgprobackup::LogLevel]   $log_level_console    = undef,
   Optional[Pgprobackup::Config]     $backups              = undef,
   String                            $version              = lookup('postgresql::globals::version'),
   String                            $package_name         = $pgprobackup::package_name,
@@ -108,6 +119,10 @@ class pgprobackup::instance(
   Integer                           $compress_level       = 1,
   Optional[Integer]                 $archive_timeout      = undef,
   Optional[String]                  $binary               = undef,
+  Boolean                           $redirect_console     = false,
+  Optional[String]                  $log_console          = undef,
+  Optional[String]                  $log_rotation_size    = undef,
+  Optional[String]                  $log_rotation_age     = undef,
   ) inherits pgprobackup {
 
   $_cluster = $cluster ? {
@@ -277,10 +292,14 @@ class pgprobackup::instance(
             archive_wal          => $archive_wal,
             log_dir              => $log_dir,
             log_file             => $log_file,
-            log_level            => $log_level,
+            log_level_file       => $log_level_file,
+            log_level_console    => $log_level_console,
             remote_user          => $remote_user,
             remote_port          => $remote_port,
             binary               => $binary,
+            redirect_console     => $redirect_console,
+            log_rotation_size    => $log_rotation_size,
+            log_rotation_age     => $log_rotation_age,
           })
         }
       } # manage_cron
