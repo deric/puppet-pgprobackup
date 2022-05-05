@@ -117,20 +117,22 @@ define pgprobackup::cron_backup(
       $_timeout = ''
     }
 
+    # configure logging to file only when filename is given
     if $log_file {
-      $_log_file = $log_file
+      $file_logs = "--log-filename=${log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
+      $logging = ''
     } else {
-      # use file per db instance
-      $_log_file = "${id}.log"
+      # some error messages might not be written to file log
+      # thus defaulting to redirecting stdout & stderr
+      $file_logs = ''
+      $logging = " >> ${log_dir}/${cluster}.log 2>&1"
     }
-
-    $logging = "--log-filename=${_log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
 
     @@cron { "pgprobackup_${backup_type}_${server_address}-${host_group}":
       command  => @("CMD"/L),
       ${_binary} ${backup_cmd} --instance ${cluster} -b ${backup_type} ${stream}--remote-host=${server_address}\
        --remote-user=${remote_user} --remote-port=${remote_port} -U ${db_user} -d ${db_name}\
-       ${logging}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}${_timeout}
+      ${file_logs}${retention}${_threads}${_temp_slot}${_slot}${_validate}${_compress}${_timeout}${logging}
       | -CMD
       user     => $backup_user,
       weekday  => $weekday,
