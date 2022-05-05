@@ -1,5 +1,15 @@
 appveyor.yml:
   delete: true
+.travis.yml:
+  delete: true
+.gitlab-ci.yml:
+  delete: true
+.editorconfig:
+  unmanaged: true
+.gitignore:
+  paths:
+    - '/.vscode/'
+    - '/.devcontainer/'
 Gemfile:
   required:
     ':development':
