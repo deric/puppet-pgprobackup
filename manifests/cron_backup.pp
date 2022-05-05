@@ -15,7 +15,8 @@ define pgprobackup::cron_backup(
   Integer                         $remote_port,
   Stdlib::AbsolutePath            $backup_dir,
   Stdlib::AbsolutePath            $log_dir,
-  String                          $log_level,
+  Optional[Pgprobackup::LogLevel] $log_level_file,
+  Optional[Pgprobackup::LogLevel] $log_level_console,
   Optional[String]                $log_file,
   Optional[Integer]               $retention_redundancy,
   Optional[Integer]               $retention_window,
@@ -119,7 +120,7 @@ define pgprobackup::cron_backup(
 
     # configure logging to file only when filename is given
     if $log_file {
-      $file_logs = "--log-filename=${log_file} --log-level-file=${log_level} --log-directory=${log_dir}"
+      $file_logs = "--log-filename=${log_file} --log-level-file=${log_level_file} --log-directory=${log_dir}"
       $logging = ''
     } else {
       # some error messages might not be written to file log
