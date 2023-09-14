@@ -23,7 +23,7 @@ class pgprobackup::catalog (
   Stdlib::AbsolutePath           $backup_dir = $pgprobackup::backup_dir,
   Optional[Stdlib::AbsolutePath] $log_dir = $pgprobackup::log_dir,
   String                         $logrotate_template = 'pgprobackup/logrotate.conf.erb',
-  String                         $exported_ipaddress = "${::ipaddress}/32",
+  String                         $exported_ipaddress = "${facts['networking']['ip']}/32",
   String                         $user = $pgprobackup::backup_user,
   String                         $group = $pgprobackup::backup_user,
   String                         $dir_mode = '0750',
@@ -42,9 +42,8 @@ class pgprobackup::catalog (
   String                         $package_name = $pgprobackup::package_name,
   Array[String]                  $versions = ['12'],
   String                         $package_ensure = $pgprobackup::package_ensure,
-) inherits ::pgprobackup {
-
-  class {'pgprobackup::install':
+) inherits pgprobackup {
+  class { 'pgprobackup::install':
     versions       => $versions,
     package_name   => $package_name,
     package_ensure => $package_ensure,
@@ -105,7 +104,7 @@ class pgprobackup::catalog (
     }
 
     file { "${backup_dir}/.ssh/known_hosts":
-      ensure  => present,
+      ensure  => file,
       owner   => $user,
       group   => $group,
       mode    => '0600',
@@ -137,10 +136,10 @@ class pgprobackup::catalog (
     Sshkey <<| tag == "pgprobackup-${host_group}" |>>
 
     # Export catalog's host key
-    @@sshkey { "pgprobackup-catalog-${::fqdn}":
+    @@sshkey { "pgprobackup-catalog-${facts['networking']['fqdn']}":
       ensure       => present,
-      host_aliases => [$::hostname, $::fqdn, $::ipaddress],
-      key          => $::sshecdsakey,
+      host_aliases => [$facts['networking']['hostname'], $facts['networking']['fqdn'], $facts['networking']['ip']],
+      key          => $facts['ssh']['ecdsa']['key'],
       type         => $pgprobackup::host_key_type,
       target       => '/var/lib/postgresql/.ssh/known_hosts',
       tag          => "pgprobackup-catalog-${host_group}",
@@ -149,8 +148,8 @@ class pgprobackup::catalog (
 
   if $manage_hba {
     # sufficient for full backup with enabled WAL archiving
-    @@postgresql::server::pg_hba_rule { "pgprobackup ${::hostname} access":
-      description => "pgprobackup ${::hostname} access",
+    @@postgresql::server::pg_hba_rule { "pgprobackup ${facts['networking']['hostname']} access":
+      description => "pgprobackup ${facts['networking']['hostname']} access",
       type        => 'host',
       database    => $pgprobackup::db_name,
       user        => $pgprobackup::db_user,
@@ -161,8 +160,8 @@ class pgprobackup::catalog (
     }
 
     # needed for streaming backups or full backup with --stream option
-    @@postgresql::server::pg_hba_rule { "pgprobackup ${::hostname} replication":
-      description => "pgprobackup ${::hostname} replication",
+    @@postgresql::server::pg_hba_rule { "pgprobackup ${facts['networking']['hostname']} replication":
+      description => "pgprobackup ${facts['networking']['hostname']} replication",
       type        => 'host',
       database    => 'replication',
       user        => $pgprobackup::db_user,
@@ -178,7 +177,7 @@ class pgprobackup::catalog (
   # custom Facter function `pgprobackup_keygen`
   if ($ssh_key_fact != undef and $ssh_key_fact != '') {
     $ssh_key_splitted = split($ssh_key_fact, ' ')
-    @@ssh_authorized_key { "pgprobackup-${::fqdn}":
+    @@ssh_authorized_key { "pgprobackup-${facts['networking']['fqdn']}":
       ensure => present,
       user   => 'postgres',
       type   => $ssh_key_splitted[0],
@@ -196,5 +195,4 @@ class pgprobackup::catalog (
       purge => $purge_cron,
     }
   }
-
 }

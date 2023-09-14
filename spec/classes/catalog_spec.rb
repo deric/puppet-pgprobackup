@@ -8,7 +8,9 @@ describe 'pgprobackup::catalog' do
     let(:facts) do
       os_facts.merge(
         pgprobackup_catalog_key: 'ssh-rsa AAABBB',
-        fqdn: 'test.localhost',
+        networking: {
+          fqdn: 'test.localhost',
+        }
       )
     end
 
