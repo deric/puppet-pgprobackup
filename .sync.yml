@@ -16,3 +16,7 @@ appveyor.yml:
 spec/spec_helper.rb:
   mock_with: ':rspec'
   coverage_report: true
+Gemfile:
+  optional:
+    ':release':
+      - gem: 'puppet-blacksmith'
