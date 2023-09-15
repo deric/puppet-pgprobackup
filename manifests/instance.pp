@@ -121,7 +121,9 @@ class pgprobackup::instance (
   Optional[Pgprobackup::LogLevel]   $log_level_file       = undef,
   Optional[Pgprobackup::LogLevel]   $log_level_console    = undef,
   Optional[Pgprobackup::Config]     $backups              = undef,
-  String                            $version              = $postgresql::globals::version,
+  # lint:ignore:lookup_in_parameter
+  String                            $version              = lookup('postgresql::globals::version'),
+  # lint:endignore
   String                            $package_name         = $pgprobackup::package_name,
   String                            $package_ensure       = $pgprobackup::package_ensure,
   Optional[Integer]                 $retention_redundancy = undef,
