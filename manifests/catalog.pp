@@ -2,11 +2,11 @@
 #
 # Configures server for storing backups.
 #
-# @param $backup_dir
+# @param backup_dir
 #   Directory for storing backups, also home directory for backup user
-# @param $user
+# @param user
 #   Local user account used for running and storing backups in its home dir.
-# @param $group
+# @param group
 #   Primary group of backup user
 # @param dir_mode
 #   Permission mode for backup storage
@@ -16,6 +16,21 @@
 #   Allows to import only certain servers
 # @param purge_cron
 #   Whether remove unmanaged entries from crontab
+# @param log_dir
+# @param logrotate_template
+# @param exported_ipaddress
+# @param user_ensure
+# @param user_shell
+# @param manage_host_keys
+# @param manage_pgpass
+# @param manage_hba
+# @param manage_cron
+# @param uid
+# @param hba_entry_order
+# @param ssh_key_fact
+# @param package_name
+# @param package_ensure
+# @param versions
 #
 # @example
 #   include pgprobackup::catalog
@@ -38,7 +53,7 @@ class pgprobackup::catalog (
   Optional[Integer]              $uid = undef,
   String                         $host_group = $pgprobackup::host_group,
   Integer                        $hba_entry_order = 50,
-  String                         $ssh_key_fact = $::pgprobackup_catalog_key,
+  String                         $ssh_key_fact = $facts['pgprobackup_catalog_key'],
   String                         $package_name = $pgprobackup::package_name,
   Array[String]                  $versions = ['12'],
   String                         $package_ensure = $pgprobackup::package_ensure,

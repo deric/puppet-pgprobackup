@@ -73,6 +73,23 @@
 # @param log_rotation_age
 #   rotate logfile if its age exceeds this value; 0 disables; (default: 0)
 #   available units: 'ms', 's', 'min', 'h', 'd' (default: min)
+# @param db_password
+# @param seed
+# @param manage_ssh_keys
+# @param manage_host_keys
+# @param manage_pgpass
+# @param manage_hba
+# @param manage_cron
+# @param archive_wal
+# @param backup_dir
+# @param backup_user
+# @param ssh_key_fact
+# @param log_dir
+# @param log_file
+# @param log_level_file
+# @param log_level_console
+# @param package_name
+# @param package_ensure
 #
 # @example
 #   include pgprobackup::instance
@@ -86,7 +103,7 @@ class pgprobackup::instance (
   String                            $db_name              = $pgprobackup::db_name,
   String                            $db_user              = $pgprobackup::db_user,
   String                            $db_cluster           = 'main',
-  Variant[String,Sensitive[String]] $db_password          = '',
+  Optional[Variant[String,Sensitive[String]]] $db_password = undef,
   Optional[String]                  $seed                 = undef,
   String                            $remote_user          = 'postgres',
   Integer                           $remote_port          = 22,
@@ -98,13 +115,13 @@ class pgprobackup::instance (
   Boolean                           $archive_wal          = false,
   Stdlib::AbsolutePath              $backup_dir           = $pgprobackup::backup_dir,
   String                            $backup_user          = $pgprobackup::backup_user,
-  String                            $ssh_key_fact         = $::pgprobackup_instance_key,
+  String                            $ssh_key_fact         = $facts['pgprobackup_instance_key'],
   Optional[Stdlib::AbsolutePath]    $log_dir              = $pgprobackup::log_dir,
   Optional[String]                  $log_file             = undef,
   Optional[Pgprobackup::LogLevel]   $log_level_file       = undef,
   Optional[Pgprobackup::LogLevel]   $log_level_console    = undef,
   Optional[Pgprobackup::Config]     $backups              = undef,
-  String                            $version              = lookup('postgresql::globals::version'),
+  String                            $version              = $postgresql::globals::version,
   String                            $package_name         = $pgprobackup::package_name,
   String                            $package_ensure       = $pgprobackup::package_ensure,
   Optional[Integer]                 $retention_redundancy = undef,
@@ -142,7 +159,7 @@ class pgprobackup::instance (
 
   # Generate password if not defined
   $real_password = $db_password ? {
-    ''      => fqdn_rand_string(64,'',$_seed),
+    undef   => fqdn_rand_string(64,'',$_seed),
     default => $db_password =~ Sensitive ? {
       true  => $db_password.unwrap,
       false => $db_password
@@ -231,6 +248,7 @@ class pgprobackup::instance (
 
   if !empty($backups) {
     $backups.each |String $host_group, Hash $config| {
+      # lint:ignore:strict_indent
       @@exec { "pgprobackup_add_instance_${facts['networking']['fqdn']}-${host_group}":
         command => @("CMD"/L),
         pg_probackup-${version} add-instance -B ${backup_dir} --instance ${_cluster} \
@@ -244,6 +262,7 @@ class pgprobackup::instance (
         user    => $backup_user, # note: error output might not be captured
         require => Package["${package_name}-${version}"],
       }
+      # lint:endignore
 
       # Collect resources exported by pgprobackup::catalog
       Postgresql::Server::Pg_hba_rule <<| tag == "pgprobackup-${host_group}" |>>
