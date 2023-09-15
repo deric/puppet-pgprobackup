@@ -1,6 +1,5 @@
 # @api private
 class pgprobackup::repo::yum inherits pgprobackup::repo {
-
   $_flavor = downcase($facts['os']['name'])
   $default_baseurl = "https://repo.postgrespro.ru/pg_probackup/keys/pg_probackup-repo-${_flavor}.noarch.rpm"
 

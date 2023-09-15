@@ -6,11 +6,10 @@ describe 'pgprobackup::catalog' do
   _, os_facts = on_supported_os.first
   context 'when running with default parameters' do
     let(:facts) do
+      # in order to merge networking facts
       os_facts.merge(
         pgprobackup_catalog_key: 'ssh-rsa AAABBB',
-        networking: {
-          fqdn: 'test.localhost',
-        }
+        # networking defined in default_module_facts.yml
       )
     end
 
@@ -21,7 +20,7 @@ describe 'pgprobackup::catalog' do
     it { is_expected.to contain_group('pgbackup') }
 
     it {
-      expect(exported_resources).to contain_ssh_authorized_key('pgprobackup-test.localhost')
+      expect(exported_resources).to contain_ssh_authorized_key('pgprobackup-psql.localhost')
         .with(
           user: 'postgres',
           type: 'ssh-rsa',

@@ -1,0 +1,8 @@
+---
+networking:
+  hostname: 'psql'
+  fqdn: 'psql.localhost'
+  ip: "172.16.254.254"
+  ip6: "FE80:0000:0000:0000:AAAA:AAAA:AAAA"
+  mac: "AA:AA:AA:AA:AA:AA"
+service_provider: systemd

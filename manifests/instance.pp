@@ -76,10 +76,10 @@
 #
 # @example
 #   include pgprobackup::instance
-class pgprobackup::instance(
-  String                            $id                   = $::hostname,
+class pgprobackup::instance (
+  String                            $id                   = $facts['networking']['hostname'],
   Optional[String]                  $cluster              = undef,
-  String                            $server_address       = $::fqdn,
+  String                            $server_address       = $facts['networking']['fqdn'],
   Integer                           $server_port          = 5432,
   Boolean                           $manage_dbuser        = true,
   String                            $db_dir               = '/var/lib/postgresql',
@@ -123,27 +123,26 @@ class pgprobackup::instance(
   Optional[String]                  $log_console          = undef,
   Optional[String]                  $log_rotation_size    = undef,
   Optional[String]                  $log_rotation_age     = undef,
-  ) inherits pgprobackup {
-
+) inherits pgprobackup {
   $_cluster = $cluster ? {
     undef   => $id,
     default => $cluster
   }
 
-  class {'pgprobackup::install':
+  class { 'pgprobackup::install':
     versions       => [$version],
     package_name   => $package_name,
     package_ensure => $package_ensure,
   }
 
   $_seed = $seed ? {
-    undef   => fqdn_rand_string('64',''),
+    undef   => fqdn_rand_string(64,''),
     default => $seed,
   }
 
   # Generate password if not defined
   $real_password = $db_password ? {
-    ''      => fqdn_rand_string('64','',$_seed),
+    ''      => fqdn_rand_string(64,'',$_seed),
     default => $db_password =~ Sensitive ? {
       true  => $db_password.unwrap,
       false => $db_password
@@ -166,7 +165,7 @@ class pgprobackup::instance(
     case $version {
       # TODO: add support for 9.5 and 9.6
       '10','11','12','13','14': {
-        class {'pgprobackup::grants::psql10':
+        class { 'pgprobackup::grants::psql10':
           db_name => $db_name,
           db_user => $db_user,
           require => Postgresql::Server::Database[$db_name],
@@ -176,7 +175,6 @@ class pgprobackup::instance(
         fail("PostgreSQL ${version} not supported")
       }
     }
-
   }
 
   # tag all target catalogs
@@ -185,15 +183,15 @@ class pgprobackup::instance(
       "pgprobackup-${group}"
     }
   } else {
-    $tags = [ "pgprobackup-${pgprobackup::host_group}" ]
+    $tags = ["pgprobackup-${pgprobackup::host_group}"]
   }
 
   if $manage_host_keys {
     # Export own host key
     @@sshkey { "postgres-${server_address}":
       ensure       => present,
-      host_aliases => [$::hostname, $::fqdn, $::ipaddress, $server_address],
-      key          => $::sshecdsakey,
+      host_aliases => [$facts['networking']['hostname'], $facts['networking']['fqdn'], $facts['networking']['ip'], $server_address],
+      key          => $facts['ssh']['ecdsa']['key'],
       type         => $pgprobackup::host_key_type,
       target       => "${backup_dir}/.ssh/known_hosts",
       tag          => $tags,
@@ -204,7 +202,7 @@ class pgprobackup::instance(
     # Export own public SSH key
     if ($ssh_key_fact != undef and $ssh_key_fact != '') {
       $ssh_key_split = split($ssh_key_fact, ' ')
-      @@ssh_authorized_key { "${remote_user}-${::fqdn}":
+      @@ssh_authorized_key { "${remote_user}-${facts['networking']['fqdn']}":
         ensure => present,
         user   => $remote_user,
         type   => $ssh_key_split[0],
@@ -231,10 +229,9 @@ class pgprobackup::instance(
     }
   }
 
-  if !empty($backups){
+  if !empty($backups) {
     $backups.each |String $host_group, Hash $config| {
-
-      @@exec { "pgprobackup_add_instance_${::fqdn}-${host_group}":
+      @@exec { "pgprobackup_add_instance_${facts['networking']['fqdn']}-${host_group}":
         command => @("CMD"/L),
         pg_probackup-${version} add-instance -B ${backup_dir} --instance ${_cluster} \
         --remote-host=${server_address} --remote-user=${remote_user} \
@@ -264,42 +261,41 @@ class pgprobackup::instance(
       }
 
       if $manage_cron {
-
-          $config.each |$backup_type, $schedule| {
+        $config.each |$backup_type, $schedule| {
           # declare cron job, use defaults from instance
-          create_resources(pgprobackup::cron_backup, {"cron_backup-${host_group}-${server_address}-${backup_type}" => $schedule} , {
-            id                   => $id,
-            cluster              => $_cluster,
-            db_name              => $db_name,
-            db_user              => $db_user,
-            version              => $version,
-            host_group           => $host_group,
-            backup_dir           => $backup_dir,
-            backup_type          => $backup_type,
-            backup_user          => $backup_user,
-            server_address       => $server_address,
-            delete_expired       => $delete_expired,
-            retention_redundancy => $retention_redundancy,
-            retention_window     => $retention_window,
-            merge_expired        => $merge_expired,
-            threads              => $threads,
-            temp_slot            => $temp_slot,
-            slot                 => $slot,
-            validate             => $validate,
-            compress_algorithm   => $compress_algorithm,
-            compress_level       => $compress_level,
-            archive_timeout      => $archive_timeout,
-            archive_wal          => $archive_wal,
-            log_dir              => $log_dir,
-            log_file             => $log_file,
-            log_level_file       => $log_level_file,
-            log_level_console    => $log_level_console,
-            remote_user          => $remote_user,
-            remote_port          => $remote_port,
-            binary               => $binary,
-            redirect_console     => $redirect_console,
-            log_rotation_size    => $log_rotation_size,
-            log_rotation_age     => $log_rotation_age,
+          create_resources(pgprobackup::cron_backup, { "cron_backup-${host_group}-${server_address}-${backup_type}" => $schedule }, {
+              id                   => $id,
+              cluster              => $_cluster,
+              db_name              => $db_name,
+              db_user              => $db_user,
+              version              => $version,
+              host_group           => $host_group,
+              backup_dir           => $backup_dir,
+              backup_type          => $backup_type,
+              backup_user          => $backup_user,
+              server_address       => $server_address,
+              delete_expired       => $delete_expired,
+              retention_redundancy => $retention_redundancy,
+              retention_window     => $retention_window,
+              merge_expired        => $merge_expired,
+              threads              => $threads,
+              temp_slot            => $temp_slot,
+              slot                 => $slot,
+              validate             => $validate,
+              compress_algorithm   => $compress_algorithm,
+              compress_level       => $compress_level,
+              archive_timeout      => $archive_timeout,
+              archive_wal          => $archive_wal,
+              log_dir              => $log_dir,
+              log_file             => $log_file,
+              log_level_file       => $log_level_file,
+              log_level_console    => $log_level_console,
+              remote_user          => $remote_user,
+              remote_port          => $remote_port,
+              binary               => $binary,
+              redirect_console     => $redirect_console,
+              log_rotation_size    => $log_rotation_size,
+              log_rotation_age     => $log_rotation_age,
           })
         }
       } # manage_cron

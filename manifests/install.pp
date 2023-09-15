@@ -1,11 +1,10 @@
 # @api private
-class pgprobackup::install(
+class pgprobackup::install (
   Array[String] $versions = ['12'],
   String        $package_ensure = 'present',
   String        $package_name = $pgprobackup::package_name,
   Boolean       $debug_symbols = true,
-  ) {
-
+) {
   $versions.each |String $version| {
     $_package_name = "${package_name}-${version}"
 
@@ -16,9 +15,8 @@ class pgprobackup::install(
     }
 
     ensure_packages($_packages, {
-      ensure  => $package_ensure,
-      tag     => 'pgprobackup',
+        ensure  => $package_ensure,
+        tag     => 'pgprobackup',
     })
   }
-
 }

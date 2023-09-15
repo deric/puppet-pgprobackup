@@ -10,21 +10,9 @@ appveyor.yml:
   paths:
     - '/.vscode/'
     - '/.devcontainer/'
-Gemfile:
-  required:
-    ':development':
-      - gem: 'librarian-puppet'
-        platforms: ruby
-  optional:
-    ':development':
-      - gem: 'github_changelog_generator'
-        version: '~> 1.15'
-        condition: "Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.3.0')"
 .gitignore:
   paths:
     - '.tmp/'
-    - '.librarian/'
-    - 'Puppetfile.lock'
 spec/spec_helper.rb:
   mock_with: ':rspec'
   coverage_report: true

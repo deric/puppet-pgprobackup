@@ -7,15 +7,15 @@ class pgprobackup::repo(
 
   case $facts['os']['family'] {
     'RedHat', 'Linux': {
-      class { 'pgprobackup::repo::yum': }
+      contain pgprobackup::repo::yum
     }
 
     'Debian': {
-      class { 'pgprobackup::repo::apt': }
+      contain pgprobackup::repo::apt
     }
 
     default: {
-      fail("Unsupported managed repository for osfamily: ${::osfamily}, operatingsystem: ${::operatingsystem}, module ${module_name} currently only supports managing repos for osfamily RedHat and Debian")
+      fail("Unsupported managed repository for osfamily: ${facts['os']['family']}, operatingsystem: ${facts['os']['name']}, module ${module_name} currently only supports managing repos for osfamily RedHat and Debian")
     }
   }
 

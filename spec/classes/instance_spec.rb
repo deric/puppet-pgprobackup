@@ -11,9 +11,12 @@ describe 'pgprobackup::instance' do
     let(:facts) do
       os_facts.merge(
         pgprobackup_instance_key: 'ssh-rsa AAABBBCCC',
-        fqdn: 'psql.localhost',
         manage_ssh_keys: true,
-        sshecdsakey: 'AAAAE2VjZHNhLXNoYTBtbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBHSTDlBLg+FouBL5gEmO1PYmVNbguoZ5ECdIG/Acwt9SylhSAqZSlKKFojY3XwcTvokz/zfeVPesnNnBVgFWmXU=',
+        ssh: {
+          ecdsa: {
+            key: 'AAAAE2VjZHNhLXNoYTBtbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBHSTDlBLg+FouBL5gEmO1PYmVNbguoZ5ECdIG/Acwt9SylhSAqZSlKKFojY3XwcTvokz/zfeVPesnNnBVgFWmXU=',
+          }
+        }
       )
     end
 
@@ -56,6 +59,7 @@ describe 'pgprobackup::instance' do
               FULL: {},
             }
           },
+          cluster: 'foo',
           version: '12',
           db_cluster: 'dev',
         }
@@ -184,6 +188,7 @@ describe 'pgprobackup::instance' do
             },
           },
           version: '12',
+          cluster: 'foo',
         }
       end
 
@@ -211,6 +216,7 @@ describe 'pgprobackup::instance' do
               DELTA: {},
             }
           },
+          cluster: 'foo',
           version: '12',
           retention_redundancy: 2,
           retention_window: 7,
@@ -242,6 +248,7 @@ describe 'pgprobackup::instance' do
               DELTA: {},
             }
           },
+          cluster: 'foo',
           binary: '/usr/local/backup',
           version: '14',
         }
@@ -272,6 +279,7 @@ describe 'pgprobackup::instance' do
               FULL: {},
             },
           },
+          cluster: 'foo',
           version: '12',
           retention_redundancy: 2,
           retention_window: 7,
@@ -315,7 +323,7 @@ describe 'pgprobackup::instance' do
 
       ['DELTA', 'FULL'].each do |backup|
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
-        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        " -B /var/lib/pgbackup --instance psql -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --threads=4'
 
@@ -347,7 +355,7 @@ describe 'pgprobackup::instance' do
 
       ['DELTA', 'FULL'].each do |backup|
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
-        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        " -B /var/lib/pgbackup --instance psql -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --temp-slot'
 
@@ -379,7 +387,7 @@ describe 'pgprobackup::instance' do
 
       ['DELTA', 'FULL'].each do |backup|
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
-        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        " -B /var/lib/pgbackup --instance psql -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup -S pg_probackup'
 
@@ -411,7 +419,7 @@ describe 'pgprobackup::instance' do
 
       ['DELTA', 'FULL'].each do |backup|
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
-        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        " -B /var/lib/pgbackup --instance psql -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --no-validate'
 
@@ -444,7 +452,7 @@ describe 'pgprobackup::instance' do
 
       ['DELTA', 'FULL'].each do |backup|
         cmd = '[ -x /usr/bin/pg_probackup-12 ] && /usr/bin/pg_probackup-12 backup'\
-        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        " -B /var/lib/pgbackup --instance psql -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --compress-algorithm=zlib --compress-level=2'
 
@@ -476,7 +484,7 @@ describe 'pgprobackup::instance' do
 
       ['DELTA', 'FULL'].each do |backup|
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
-        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        " -B /var/lib/pgbackup --instance psql -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --archive-timeout=600'
 
@@ -535,7 +543,7 @@ describe 'pgprobackup::instance' do
       it 'has DELTA backup on b01' do
         backup = 'DELTA'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
-        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        " -B /var/lib/pgbackup --instance psql -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --archive-timeout=600'
 
@@ -552,7 +560,7 @@ describe 'pgprobackup::instance' do
       it 'has FULL backup on b01' do
         backup = 'FULL'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
-        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        " -B /var/lib/pgbackup --instance psql -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --archive-timeout=600'
 
@@ -569,7 +577,7 @@ describe 'pgprobackup::instance' do
       it 'has DELTA backup on b02' do
         backup = 'DELTA'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
-        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        " -B /var/lib/pgbackup --instance psql -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --archive-timeout=600'
 
@@ -586,7 +594,7 @@ describe 'pgprobackup::instance' do
       it 'has FULL backup on b02' do
         backup = 'FULL'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
-        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        " -B /var/lib/pgbackup --instance psql -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --archive-timeout=600'
 
@@ -629,7 +637,7 @@ describe 'pgprobackup::instance' do
       it 'has DELTA backup on b01' do
         backup = 'DELTA'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
-        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        " -B /var/lib/pgbackup --instance psql -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --threads=4 --compress-algorithm=zlib --compress-level=3'\
         ' --archive-timeout=600'
@@ -645,7 +653,7 @@ describe 'pgprobackup::instance' do
       it 'has FULL backup on b02' do
         backup = 'FULL'
         cmd = '[ -x /usr/bin/pg_probackup-13 ] && /usr/bin/pg_probackup-13 backup'\
-        " -B /var/lib/pgbackup --instance foo -b #{backup} --stream"\
+        " -B /var/lib/pgbackup --instance psql -b #{backup} --stream"\
         ' --remote-host=psql.localhost --remote-user=postgres --remote-port=22'\
         ' -U backup -d backup --retention-redundancy=2 --retention-window=7'\
         ' --delete-expired --archive-timeout=600'
