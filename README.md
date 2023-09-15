@@ -1,7 +1,7 @@
 # puppet-pgprobackup
 
 [![Puppet
-Forge](http://img.shields.io/puppetforge/v/deric/pgprobackup.svg)](https://forge.puppet.com/modules/deric/pgprobackup) [![Build Status](https://img.shields.io/github/workflow/status/deric/puppet-pgprobackup/Static%20&%20Spec%20Tests/master)](https://github.com/deric/puppet-pgprobackup/actions?query=branch%3Amaster)
+Forge](http://img.shields.io/puppetforge/v/deric/pgprobackup.svg)](https://forge.puppet.com/modules/deric/pgprobackup) [![Static & Spec Tests](https://github.com/deric/puppet-pgprobackup/actions/workflows/spec.yml/badge.svg)](https://github.com/deric/puppet-pgprobackup/actions/workflows/spec.yml)
 
 
 
