@@ -27,7 +27,7 @@
 #   When enabled, create rule for connection from backup catalog server to DB instance.
 # @example
 #   include pgprobackup
-class pgprobackup(
+class pgprobackup (
   String                         $package_name,
   String                         $package_ensure   = 'present',
   String                         $host_group       = 'common',
@@ -45,7 +45,5 @@ class pgprobackup(
   Boolean                        $manage_cron      = true,
   String                         $host_key_type    = 'ecdsa-sha2-nistp256',
 ) {
-
   contain pgprobackup::repo
-
 }

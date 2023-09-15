@@ -16,7 +16,7 @@ describe 'pgprobackup::instance' do
           ecdsa: {
             key: 'AAAAE2VjZHNhLXNoYTBtbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBHSTDlBLg+FouBL5gEmO1PYmVNbguoZ5ECdIG/Acwt9SylhSAqZSlKKFojY3XwcTvokz/zfeVPesnNnBVgFWmXU=',
           }
-        }
+        },
       )
     end
 
