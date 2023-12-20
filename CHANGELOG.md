@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
-## [v1.0.0](https://github.com/deric/puppet-pgprobackup/tree/v0.5.0) (2022-05-05)
+## [v1.1.0](https://github.com/deric/puppet-pgprobackup/tree/v1.1.0) (2023-12-20)
+
+- Fixed invalid common.yaml
+- Support puppetlabs-postgresql 10.x
+- Fix upper bounds for dependencies
+
+[Full Changelog](https://github.com/deric/puppet-pgprobackup/compare/v1.0.0...v1.1.0)
+
+## [v1.0.0](https://github.com/deric/puppet-pgprobackup/tree/v1.0.0) (2023-09-15)
 
 - Puppet 8 compatibility
 - Removed legacy facts
