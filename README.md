@@ -55,6 +55,8 @@ NOTE: Package version `catalog` and `instance` needs to be exactly the same! (e.
 pgprobackup::package_ensure: "2.4.2-1.8db55b42aeece064.%{facts.os.distro.codename}"
 ```
 
+All Puppet variables are documented in [REFERENCE.md](./REFERENCE.md).
+
 ### Instance
 
 DB server:
