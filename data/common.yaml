@@ -1,1 +1,14 @@
 ---
+pgprobackup::package_ensure: installed
+pgprobackup::host_group: common
+pgprobackup::db_name: backup
+pgprobackup::db_user: backup
+pgprobackup::debug_symbols: true
+pgprobackup::backup_dir: /var/lib/pgbackup
+pgprobackup::backup_user: pgbackup
+pgprobackup::manage_ssh_keys: true
+pgprobackup::manage_host_keys: true
+pgprobackup::manage_pgpass: true
+pgprobackup::manage_hba: true
+pgprobackup::manage_cron: true
+pgprobackup::host_key_type: ecdsa-sha2-nistp256
