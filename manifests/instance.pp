@@ -171,7 +171,7 @@ class pgprobackup::instance (
   if $manage_dbuser {
     postgresql::server::role { $db_user:
       login         => true,
-      password_hash => postgresql_password($db_user, $real_password),
+      password_hash => postgresql::postgresql_password($db_user, $real_password),
       superuser     => false,
       replication   => true,
     }
