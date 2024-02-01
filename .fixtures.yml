@@ -4,6 +4,7 @@
 fixtures:
   forge_modules:
      apt: puppetlabs/apt
+     archive: puppet/archive
      concat: puppetlabs/concat
      cron_core: puppetlabs/cron_core
      postgresql: puppetlabs/postgresql
