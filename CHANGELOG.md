@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+
+## [v1.2.0](https://github.com/deric/puppet-pgprobackup/tree/v1.1.0) (2024-02-01)
+
+- Refactor GPG key usage for apt
+- Use namespaced function `postgresql::postgresql_password`
+
 ## [v1.1.0](https://github.com/deric/puppet-pgprobackup/tree/v1.1.0) (2023-12-20)
 
 - Fixed invalid common.yaml
