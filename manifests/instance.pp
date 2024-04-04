@@ -80,6 +80,8 @@
 # @param manage_pgpass
 # @param manage_hba
 # @param manage_cron
+# @param manage_grants
+#  Whether grants needed for backups are managed, default true
 # @param archive_wal
 # @param backup_dir
 # @param backup_user
@@ -112,6 +114,7 @@ class pgprobackup::instance (
   Boolean                           $manage_pgpass        = $pgprobackup::manage_pgpass,
   Boolean                           $manage_hba           = $pgprobackup::manage_hba,
   Boolean                           $manage_cron          = $pgprobackup::manage_cron,
+  Boolean                           $manage_grants        = true,
   Boolean                           $archive_wal          = false,
   Stdlib::AbsolutePath              $backup_dir           = $pgprobackup::backup_dir,
   String                            $backup_user          = $pgprobackup::backup_user,
@@ -181,17 +184,12 @@ class pgprobackup::instance (
       require => Postgresql::Server::Role[$db_user],
     }
 
-    case $version {
-      # TODO: add support for 9.5 and 9.6
-      '10','11','12','13','14': {
-        class { 'pgprobackup::grants::psql10':
-          db_name => $db_name,
-          db_user => $db_user,
-          require => Postgresql::Server::Database[$db_name],
-        }
-      }
-      default: {
-        fail("PostgreSQL ${version} not supported")
+    if $manage_grants {
+      # grants for postgresql 10 and newer
+      class { 'pgprobackup::grants::psql10':
+        db_name => $db_name,
+        db_user => $db_user,
+        require => Postgresql::Server::Database[$db_name],
       }
     }
   }
