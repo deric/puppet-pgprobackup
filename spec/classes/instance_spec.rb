@@ -51,6 +51,20 @@ describe 'pgprobackup::instance' do
       }
     end
 
+    it { is_expected.to contain_postgresql__server__grant('current_setting-to-backup') }
+    it { is_expected.to contain_postgresql__server__grant('pg_start_backup-to-backup') }
+    it { is_expected.to contain_postgresql__server__grant('pg_stop_backup-to-backup') }
+    it { is_expected.to contain_postgresql__server__grant('pg_catalog_usage_to_backup') }
+    it { is_expected.to contain_postgresql__server__grant('pg_control_checkpoint-to-backup') }
+    it { is_expected.to contain_postgresql__server__grant('pg_is_in_recovery-to-backup') }
+    it { is_expected.to contain_postgresql__server__grant('pg_last_wal_replay_lsn-to-backup') }
+    it { is_expected.to contain_postgresql__server__grant('pg_create_restore_point-to-backup') }
+    it { is_expected.to contain_postgresql__server__grant('pg_switch_wal-to-backup') }
+    it { is_expected.to contain_postgresql__server__grant('set_config-to-backup') }
+    it { is_expected.to contain_postgresql__server__grant('txid_current-to-backup') }
+    it { is_expected.to contain_postgresql__server__grant('txid_current_snapshot-to-backup') }
+    it { is_expected.to contain_postgresql__server__grant('txid_snapshot_xmax-to-backup') }
+
     context 'with enabled FULL backup' do
       let(:params) do
         {
@@ -1000,6 +1014,56 @@ describe 'pgprobackup::instance' do
             )
         }
       end
+    end
+
+    context 'with grants on postgresql 14' do
+      let(:params) do
+        {
+          version: '14',
+          id: 'psql',
+          db_name: 'pg_backup',
+          db_user:  'pg_probackup',
+          manage_grants: true
+        }
+      end
+
+      it { is_expected.to contain_postgresql__server__grant('current_setting-to-pg_probackup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_start_backup-to-pg_probackup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_stop_backup-to-pg_probackup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_catalog_usage_to_pg_probackup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_control_checkpoint-to-pg_probackup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_is_in_recovery-to-pg_probackup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_last_wal_replay_lsn-to-pg_probackup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_create_restore_point-to-pg_probackup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_switch_wal-to-pg_probackup') }
+      it { is_expected.to contain_postgresql__server__grant('set_config-to-pg_probackup') }
+      it { is_expected.to contain_postgresql__server__grant('txid_current-to-pg_probackup') }
+      it { is_expected.to contain_postgresql__server__grant('txid_current_snapshot-to-pg_probackup') }
+      it { is_expected.to contain_postgresql__server__grant('txid_snapshot_xmax-to-pg_probackup') }
+    end
+
+    context 'with grants on postgresql 15' do
+      let(:params) do
+        {
+          version: '15',
+          id: 'psql',
+          manage_grants: true
+        }
+      end
+
+      it { is_expected.to contain_postgresql__server__grant('current_setting-to-backup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_backup_start-to-backup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_backup_stop-to-backup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_catalog_usage_to_backup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_control_checkpoint-to-backup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_is_in_recovery-to-backup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_last_wal_replay_lsn-to-backup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_create_restore_point-to-backup') }
+      it { is_expected.to contain_postgresql__server__grant('pg_switch_wal-to-backup') }
+      it { is_expected.to contain_postgresql__server__grant('set_config-to-backup') }
+      it { is_expected.to contain_postgresql__server__grant('txid_current-to-backup') }
+      it { is_expected.to contain_postgresql__server__grant('txid_current_snapshot-to-backup') }
+      it { is_expected.to contain_postgresql__server__grant('txid_snapshot_xmax-to-backup') }
     end
   end
 end
