@@ -454,6 +454,7 @@ The following parameters are available in the `pgprobackup::instance` class:
 * [`manage_pgpass`](#-pgprobackup--instance--manage_pgpass)
 * [`manage_hba`](#-pgprobackup--instance--manage_hba)
 * [`manage_cron`](#-pgprobackup--instance--manage_cron)
+* [`manage_grants`](#-pgprobackup--instance--manage_grants)
 * [`archive_wal`](#-pgprobackup--instance--archive_wal)
 * [`backup_dir`](#-pgprobackup--instance--backup_dir)
 * [`backup_user`](#-pgprobackup--instance--backup_user)
@@ -754,6 +755,14 @@ Data type: `Boolean`
 
 
 Default value: `$pgprobackup::manage_cron`
+
+##### <a name="-pgprobackup--instance--manage_grants"></a>`manage_grants`
+
+Data type: `Boolean`
+
+Whether grants needed for backups are managed, default true
+
+Default value: `true`
 
 ##### <a name="-pgprobackup--instance--archive_wal"></a>`archive_wal`
 
