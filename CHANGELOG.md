@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v1.3.0](https://github.com/deric/puppet-pgprobackup/tree/v1.3.0) (2024-04-04)
+
+ - Optionally mangage grants
+ - Support all Postgresql version >= 10
+
+[Full Changelog](https://github.com/deric/puppet-pgprobackup/compare/v1.2.0...v1.3.0)
 
 ## [v1.2.0](https://github.com/deric/puppet-pgprobackup/tree/v1.1.0) (2024-02-01)
 
