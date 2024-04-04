@@ -194,7 +194,7 @@ class pgprobackup::instance (
           class { 'pgprobackup::grants':
             db_name => $db_name,
             db_user => $db_user,
-            version => Integer($version),
+            version => $version,
             require => Postgresql::Server::Database[$db_name],
           }
         }

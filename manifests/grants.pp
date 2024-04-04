@@ -2,9 +2,9 @@
 # @api private
 # @see https://postgrespro.com/docs/enterprise/15/app-pgprobackup
 class pgprobackup::grants (
-  String  $db_name,
-  String  $db_user,
-  Integer $version,
+  String $db_name,
+  String $db_user,
+  String $version,
 ) {
   # GRANT USAGE ON SCHEMA pg_catalog TO backup;
   postgresql::server::grant { "pg_catalog_usage_to_${db_user}":
@@ -44,7 +44,7 @@ class pgprobackup::grants (
     object_name => ['pg_catalog', 'pg_is_in_recovery'],
   }
 
-  if $version < 15 {
+  if versioncmp($version, '15') < 0 {
     # GRANT EXECUTE ON FUNCTION pg_catalog.pg_start_backup(text, boolean, boolean) TO backup;
     postgresql::server::grant { "pg_start_backup-to-${db_user}":
       db               => $db_name,
