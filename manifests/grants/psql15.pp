@@ -24,7 +24,7 @@ class pgprobackup::grants::psql15 (
   }
 
   # GRANT EXECUTE ON FUNCTION pg_catalog.set_config(text, text, boolean) TO backup;
-  postgresql::server::grant { "current_setting-to-${db_user}":
+  postgresql::server::grant { "set_config-to-${db_user}":
     db               => $db_name,
     role             => $db_user,
     privilege        => 'EXECUTE',
