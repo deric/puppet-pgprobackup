@@ -185,11 +185,19 @@ class pgprobackup::instance (
     }
 
     if $manage_grants {
-      # grants for postgresql 10 and newer
-      class { 'pgprobackup::grants::psql10':
-        db_name => $db_name,
-        db_user => $db_user,
-        require => Postgresql::Server::Database[$db_name],
+      case $version {
+        '9.6': {
+          fail("PostgreSQL ${version} not supported")
+        }
+        default: {
+          # grants for postgresql 10 and newer
+          class { 'pgprobackup::grants':
+            db_name => $db_name,
+            db_user => $db_user,
+            version => $version,
+            require => Postgresql::Server::Database[$db_name],
+          }
+        }
       }
     }
   }

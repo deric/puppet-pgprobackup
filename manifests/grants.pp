@@ -1,7 +1,10 @@
+# @summary Manages priviledges required for executing backup
 # @api private
-class pgprobackup::grants::psql10 (
+# @see https://postgrespro.com/docs/enterprise/15/app-pgprobackup
+class pgprobackup::grants (
   String $db_name,
-  String $db_user
+  String $db_user,
+  String $version,
 ) {
   # GRANT USAGE ON SCHEMA pg_catalog TO backup;
   postgresql::server::grant { "pg_catalog_usage_to_${db_user}":
@@ -22,6 +25,16 @@ class pgprobackup::grants::psql10 (
     object_arguments => ['text'],
   }
 
+  # GRANT EXECUTE ON FUNCTION pg_catalog.set_config(text, text, boolean) TO backup;
+  postgresql::server::grant { "set_config-to-${db_user}":
+    db               => $db_name,
+    role             => $db_user,
+    privilege        => 'EXECUTE',
+    object_type      => 'FUNCTION',
+    object_name      => ['pg_catalog', 'set_config'],
+    object_arguments => ['text','text','boolean'],
+  }
+
   # GRANT EXECUTE ON FUNCTION pg_catalog.pg_is_in_recovery() TO backup;
   postgresql::server::grant { "pg_is_in_recovery-to-${db_user}":
     db          => $db_name,
@@ -31,24 +44,47 @@ class pgprobackup::grants::psql10 (
     object_name => ['pg_catalog', 'pg_is_in_recovery'],
   }
 
-  # GRANT EXECUTE ON FUNCTION pg_catalog.pg_start_backup(text, boolean, boolean) TO backup;
-  postgresql::server::grant { "pg_start_backup-to-${db_user}":
-    db               => $db_name,
-    role             => $db_user,
-    privilege        => 'EXECUTE',
-    object_type      => 'FUNCTION',
-    object_name      => ['pg_catalog','pg_start_backup'],
-    object_arguments => ['text', 'boolean', 'boolean'],
-  }
+  if versioncmp($version, '15') < 0 {
+    # GRANT EXECUTE ON FUNCTION pg_catalog.pg_start_backup(text, boolean, boolean) TO backup;
+    postgresql::server::grant { "pg_start_backup-to-${db_user}":
+      db               => $db_name,
+      role             => $db_user,
+      privilege        => 'EXECUTE',
+      object_type      => 'FUNCTION',
+      object_name      => ['pg_catalog','pg_start_backup'],
+      object_arguments => ['text', 'boolean', 'boolean'],
+    }
 
-  # GRANT EXECUTE ON FUNCTION pg_catalog.pg_stop_backup(boolean, boolean) TO backup;
-  postgresql::server::grant { "pg_stop_backup-to-${db_user}":
-    db               => $db_name,
-    role             => $db_user,
-    privilege        => 'EXECUTE',
-    object_type      => 'FUNCTION',
-    object_name      => ['pg_catalog','pg_stop_backup'],
-    object_arguments => ['boolean', 'boolean'],
+    # GRANT EXECUTE ON FUNCTION pg_catalog.pg_stop_backup(boolean, boolean) TO backup;
+    postgresql::server::grant { "pg_stop_backup-to-${db_user}":
+      db               => $db_name,
+      role             => $db_user,
+      privilege        => 'EXECUTE',
+      object_type      => 'FUNCTION',
+      object_name      => ['pg_catalog','pg_stop_backup'],
+      object_arguments => ['boolean', 'boolean'],
+    }
+  } else {
+    # Introduced in PostgreSQL 15: https://pgpedia.info/p/pg_backup_start.html
+    # GRANT EXECUTE ON FUNCTION pg_catalog.pg_backup_start(text, boolean) TO backup;
+    postgresql::server::grant { "pg_backup_start-to-${db_user}":
+      db               => $db_name,
+      role             => $db_user,
+      privilege        => 'EXECUTE',
+      object_type      => 'FUNCTION',
+      object_name      => ['pg_catalog','pg_backup_start'],
+      object_arguments => ['text', 'boolean'],
+    }
+
+    # GRANT EXECUTE ON FUNCTION pg_catalog.pg_backup_stop(boolean) TO backup;
+    postgresql::server::grant { "pg_backup_stop-to-${db_user}":
+      db               => $db_name,
+      role             => $db_user,
+      privilege        => 'EXECUTE',
+      object_type      => 'FUNCTION',
+      object_name      => ['pg_catalog','pg_backup_stop'],
+      object_arguments => ['boolean'],
+    }
   }
 
   # GRANT EXECUTE ON FUNCTION pg_catalog.pg_create_restore_point(text) TO backup;
