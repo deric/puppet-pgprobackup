@@ -7,10 +7,15 @@ All notable changes to this project will be documented in this file. The format 
 
  - require `stdlib > 9.1.0` in order to support passing `undef` to `fqdn_rand_string` as 2nd arg
 
+[Full Changelog](https://github.com/deric/puppet-pgprobackup/compare/v2.0.1...v2.0.2)
+
 
 ## [v2.0.1](https://github.com/deric/puppet-pgprobackup/tree/v2.0.0) (2024-06-21)
 
  - Use `stdlib::fqdn_rand_string`
+
+[Full Changelog](https://github.com/deric/puppet-pgprobackup/compare/v2.0.0...v2.0.1)
+
 
 ## [v2.0.0](https://github.com/deric/puppet-pgprobackup/tree/v2.0.0) (2024-06-21)
 
