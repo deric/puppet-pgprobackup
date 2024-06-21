@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
 
+## [v2.0.2](https://github.com/deric/puppet-pgprobackup/tree/v2.0.0) (2024-06-22)
+
+ - require `stdlib > 9.1.0` in order to support passing `undef` to `fqdn_rand_string` as 2nd arg
+
+
 ## [v2.0.1](https://github.com/deric/puppet-pgprobackup/tree/v2.0.0) (2024-06-21)
 
  - Use `stdlib::fqdn_rand_string`
