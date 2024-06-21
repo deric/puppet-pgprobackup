@@ -158,13 +158,13 @@ class pgprobackup::instance (
   }
 
   $_seed = $seed ? {
-    undef   => fqdn_rand_string(64,''),
+    undef   => stdlib::fqdn_rand_string(64),
     default => $seed,
   }
 
   # Generate password if not defined
   $real_password = $db_password ? {
-    undef   => fqdn_rand_string(64,'',$_seed),
+    undef   => stdlib::fqdn_rand_string(64, undef, $_seed),
     default => $db_password =~ Sensitive ? {
       true  => $db_password.unwrap,
       false => $db_password
