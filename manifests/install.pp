@@ -14,7 +14,7 @@ class pgprobackup::install (
       $_packages = [$_package_name]
     }
 
-    ensure_packages($_packages, {
+    stdlib::ensure_packages($_packages, {
         ensure  => $package_ensure,
         tag     => 'pgprobackup',
     })
