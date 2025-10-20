@@ -118,7 +118,7 @@ class pgprobackup::instance (
   Boolean                           $archive_wal          = false,
   Stdlib::AbsolutePath              $backup_dir           = $pgprobackup::backup_dir,
   String                            $backup_user          = $pgprobackup::backup_user,
-  String                            $ssh_key_fact         = $facts['pgprobackup_instance_key'],
+  Optional[String]                  $ssh_key_fact         = $facts['pgprobackup_instance_key'],
   Optional[Stdlib::AbsolutePath]    $log_dir              = $pgprobackup::log_dir,
   Optional[String]                  $log_file             = undef,
   Optional[Pgprobackup::LogLevel]   $log_level_file       = undef,

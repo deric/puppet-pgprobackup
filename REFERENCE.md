@@ -14,7 +14,7 @@
 
 #### Private Classes
 
-* `pgprobackup::grants::psql10`
+* `pgprobackup::grants`: Manages priviledges required for executing backup
 * `pgprobackup::install`
 * `pgprobackup::repo`
 * `pgprobackup::repo::apt`
@@ -358,7 +358,7 @@ Default value: `50`
 
 ##### <a name="-pgprobackup--catalog--ssh_key_fact"></a>`ssh_key_fact`
 
-Data type: `String`
+Data type: `Optional[String]`
 
 
 
@@ -790,7 +790,7 @@ Default value: `$pgprobackup::backup_user`
 
 ##### <a name="-pgprobackup--instance--ssh_key_fact"></a>`ssh_key_fact`
 
-Data type: `String`
+Data type: `Optional[String]`
 
 
 

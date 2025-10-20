@@ -53,7 +53,7 @@ class pgprobackup::catalog (
   Optional[Integer]              $uid = undef,
   String                         $host_group = $pgprobackup::host_group,
   Integer                        $hba_entry_order = 50,
-  String                         $ssh_key_fact = $facts['pgprobackup_catalog_key'],
+  Optional[String]               $ssh_key_fact = $facts['pgprobackup_catalog_key'],
   String                         $package_name = $pgprobackup::package_name,
   Array[String]                  $versions = ['12'],
   String                         $package_ensure = $pgprobackup::package_ensure,
