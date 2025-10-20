@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file. The format 
  - Support Debian 13, Ubuntu 24.04
  - Support puppet/archive 8.x
  - Support puppetlabs/apt 11.x
+ - Mark `ssh_key_fact` as Optional
+ - Fix rexml dependency vulnerability
 
 [Full Changelog](https://github.com/deric/puppet-pgprobackup/compare/v2.0.2...v2.1.0)
 
