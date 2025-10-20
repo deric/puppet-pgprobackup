@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
 
+## [v2.1.0](https://github.com/deric/puppet-pgprobackup/tree/v2.1.0) (2025-10-20)
+
+ - Drop Debian 10, Ubuntu 18.04 support
+ - Support Debian 13, Ubuntu 24.04
+ - Support puppet/archive 8.x
+ - Support puppetlabs/apt 11.x
+
+[Full Changelog](https://github.com/deric/puppet-pgprobackup/compare/v2.0.2...v2.1.0)
+
+
+
 ## [v2.0.2](https://github.com/deric/puppet-pgprobackup/tree/v2.0.0) (2024-06-22)
 
  - require `stdlib > 9.1.0` in order to support passing `undef` to `fqdn_rand_string` as 2nd arg
