@@ -16,6 +16,7 @@ describe 'pgprobackup::install' do
       end
 
       it { is_expected.to contain_class('pgprobackup') }
+      it { is_expected.to contain_class('pgprobackup::repo') }
 
       case os_facts[:os]['family']
       when 'Debian'
@@ -122,6 +123,19 @@ describe 'pgprobackup::install' do
         else
           it { is_expected.to compile.and_raise_error(%r{Unsupported managed repository for osfamily}) }
         end
+      end
+
+      context 'without managed repo' do
+        let(:pre_condition) do
+          <<~PP
+            class { 'pgprobackup':
+              manage_repo => false,
+            }
+          PP
+        end
+
+        it { is_expected.to contain_class('pgprobackup') }
+        it { is_expected.not_to contain_class('pgprobackup::repo') }
       end
     end
   end
