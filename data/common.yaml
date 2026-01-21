@@ -11,4 +11,5 @@ pgprobackup::manage_host_keys: true
 pgprobackup::manage_pgpass: true
 pgprobackup::manage_hba: true
 pgprobackup::manage_cron: true
+pgprobackup::manage_repo: true
 pgprobackup::host_key_type: ssh-ed25519

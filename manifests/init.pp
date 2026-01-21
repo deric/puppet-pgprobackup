@@ -25,6 +25,8 @@
 #   When true, configures password for database authentication (for backup role).
 # @param manage_hba
 #   When enabled, create rule for connection from backup catalog server to DB instance.
+# @param manage_repo
+#   Whether apt/yum repository should be managed
 # @param backup_user
 # @param manage_cron
 # @param log_dir
@@ -45,9 +47,12 @@ class pgprobackup (
   Boolean                        $manage_pgpass,
   Boolean                        $manage_hba,
   Boolean                        $manage_cron,
+  Boolean                        $manage_repo,
   String                         $host_key_type,
   Optional[Stdlib::AbsolutePath] $log_dir = undef,
   Optional[String]               $debug_suffix = undef,
 ) {
-  contain pgprobackup::repo
+  if $manage_repo {
+    contain pgprobackup::repo
+  }
 }
