@@ -67,6 +67,7 @@ The following parameters are available in the `pgprobackup` class:
 * [`manage_host_keys`](#-pgprobackup--manage_host_keys)
 * [`manage_pgpass`](#-pgprobackup--manage_pgpass)
 * [`manage_hba`](#-pgprobackup--manage_hba)
+* [`manage_repo`](#-pgprobackup--manage_repo)
 * [`backup_user`](#-pgprobackup--backup_user)
 * [`manage_cron`](#-pgprobackup--manage_cron)
 * [`log_dir`](#-pgprobackup--log_dir)
@@ -146,6 +147,12 @@ When true, configures password for database authentication (for backup role).
 Data type: `Boolean`
 
 When enabled, create rule for connection from backup catalog server to DB instance.
+
+##### <a name="-pgprobackup--manage_repo"></a>`manage_repo`
+
+Data type: `Boolean`
+
+Whether apt/yum repository should be managed
 
 ##### <a name="-pgprobackup--backup_user"></a>`backup_user`
 
