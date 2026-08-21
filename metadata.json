@@ -1,6 +1,6 @@
 {
   "name": "deric-pgprobackup",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "author": "deric",
   "summary": "Manage PostgreSQL database backups using pg_probackup tool",
   "license": "Apache-2.0",
@@ -16,7 +16,7 @@
     },
     {
       "name": "puppetlabs/cron_core",
-      "version_requirement": "> 1.0.0 < 2.0.0"
+      "version_requirement": "> 1.0.0 < 3.0.0"
     },
     {
       "name": "puppetlabs/postgresql",
@@ -24,11 +24,11 @@
     },
     {
       "name": "puppetlabs/sshkeys_core",
-      "version_requirement": "> 1.0.0 < 3.0.0"
+      "version_requirement": "> 1.0.0 < 4.0.0"
     },
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 9.1.0 < 10.0.0"
+      "version_requirement": ">= 9.1.0 < 11.0.0"
     },
     {
       "name": "puppetlabs/yumrepo_core",
