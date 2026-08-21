@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v3.1.0](https://github.com/deric/puppet-pgprobackup/tree/v3.1.0) (2026-08-21)
+
+ - Support `puppetlabs/sshkeys_core` 3.x
+ - Support `puppetlabs/stdlib` 10.x
+ - Support `puppetlabs/cron_core` 2.x
+
+[Full Changelog](https://github.com/deric/puppet-pgprobackup/compare/v3.0.0...v3.1.0)
+
+
+
 ## [v3.0.0](https://github.com/deric/puppet-pgprobackup/tree/v3.1.0) (2026-01-21)
 
  - Drop Puppet 7 support
